@@ -1,0 +1,17 @@
+# credentials — never commit
+.env
+*.env
+credentials*
+*.secret
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
