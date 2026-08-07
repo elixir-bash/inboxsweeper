@@ -1,0 +1,210 @@
+#!/usr/bin/env python3
+"""Local browser UI for mail-declutter. Launched via `gmail_cleanup.py serve`.
+
+Binds to 127.0.0.1 only, guarded by a random per-run token in the URL. Reuses the
+engine in gmail_cleanup.py — no duplicated cleanup logic.
+"""
+import json, os, re, secrets, smtplib, threading, webbrowser
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from email.mime.text import MIMEText
+from urllib.parse import unquote
+
+import gmail_cleanup as E   # the engine (same folder)
+
+TOKEN = secrets.token_urlsafe(16)
+
+PAGE = """<!doctype html><html><head><meta charset=utf-8>
+<title>Mail Declutter</title><meta name=viewport content="width=device-width,initial-scale=1">
+<style>
+:root{color-scheme:light dark}
+body{font:15px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;max-width:820px;margin:0 auto;padding:24px;
+ background:#0b0e14;color:#e6e6e6}
+h1{font-size:22px;margin:0 0 4px} .sub{color:#8a94a6;margin:0 0 20px}
+.card{background:#151a23;border:1px solid #232a36;border-radius:12px;padding:18px;margin:14px 0}
+label{display:block;font-size:13px;color:#9aa4b2;margin:10px 0 4px}
+input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #2a3240;background:#0f141c;color:#e6e6e6;box-sizing:border-box}
+button{background:#3b82f6;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;margin-top:12px}
+button.ghost{background:#232a36} button.danger{background:#dc2626} button:disabled{opacity:.5;cursor:default}
+table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;padding:7px 8px;border-bottom:1px solid #232a36;font-size:14px}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px} .p{background:#3b2f0b;color:#f5c451} .j{background:#0b2f1e;color:#4ade80}
+.method{color:#8a94a6;font-size:12px} details{margin-top:10px} summary{cursor:pointer;color:#60a5fa}
+#log{white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,monospace;color:#9aa4b2;margin-top:10px;max-height:220px;overflow:auto}
+.hint{color:#8a94a6;font-size:13px} a{color:#60a5fa}
+.hide{display:none}
+</style></head><body>
+<h1>Mail Declutter</h1>
+<p class=sub>Clean up and unsubscribe from promotional email. Deletions go to Trash (recoverable).</p>
+
+<div class=card id=connect>
+ <label>Provider</label>
+ <select id=provider><option value=gmail>Gmail</option><option value=yahoo>Yahoo</option></select>
+ <label>Email address</label><input id=addr placeholder="you@gmail.com">
+ <label>App password <span class=hint>(not your normal password)</span></label>
+ <input id=pw type=password placeholder="16-character app password">
+ <details><summary>How do I get an app password?</summary>
+  <p class=hint id=apphelp></p></details>
+ <button onclick=connect()>Connect</button>
+ <div id=cstatus class=hint></div>
+</div>
+
+<div class=card id=main style="display:none">
+ <button onclick=scan()>Scan my inbox</button>
+ <span class=hint id=scanmsg></span>
+ <div id=results class=hide>
+  <table><thead><tr><th><input type=checkbox id=all onclick=toggleAll()></th><th>Sender</th><th>#</th><th>Unsubscribe</th><th></th></tr></thead>
+  <tbody id=rows></tbody></table>
+  <button class=danger onclick=sweep()>Move selected to Trash</button>
+  <button class=ghost onclick=unsub()>Unsubscribe from selected</button>
+ </div>
+ <div id=log></div>
+</div>
+<script>
+const T="__TOKEN__";
+const help={gmail:"Turn on 2-Step Verification, then create one at <a href=https://myaccount.google.com/apppasswords target=_blank>myaccount.google.com/apppasswords</a>.",
+ yahoo:"Turn on 2-Step Verification, then 'Create app password' at <a href=https://login.yahoo.com/account/security target=_blank>login.yahoo.com/account/security</a>."};
+function setHelp(){apphelp.innerHTML=help[provider.value]}
+provider.onchange=setHelp; setHelp();
+async function api(path,body){const r=await fetch(path,{method:'POST',headers:{'X-Token':T,'Content-Type':'application/json'},body:JSON.stringify(body||{})});return r.json()}
+function log(m){document.getElementById('log').textContent+=m+"\\n";document.getElementById('log').scrollTop=1e9}
+async function connect(){cstatus.textContent="Verifying…";const r=await api('/api/connect',{provider:provider.value,addr:addr.value,pw:pw.value});
+ if(r.ok){cstatus.textContent="Connected ✓";document.getElementById('main').style.display='block';document.getElementById('connect').style.opacity=.6}
+ else cstatus.textContent="Failed: "+r.error}
+let ROWS=[];
+async function scan(){scanmsg.textContent=" scanning… (can take ~20s)";results.classList.add('hide');
+ const r=await api('/api/scan',{provider:provider.value});scanmsg.textContent="";
+ if(r.error){log("scan error: "+r.error);return}
+ ROWS=r.senders;const tb=document.getElementById('rows');tb.innerHTML="";
+ ROWS.forEach((s,i)=>{const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input type=checkbox data-i=${i} ${s.protected?'':'checked'} ${s.protected?'disabled':''}></td>
+   <td>${s.domain}</td><td>${s.count}</td><td class=method>${s.method}</td>
+   <td>${s.protected?'<span class="tag p">protected</span>':'<span class="tag j">junk</span>'}</td>`;tb.appendChild(tr)});
+ results.classList.remove('hide')}
+function selected(){return [...document.querySelectorAll('#rows input:checked')].map(c=>ROWS[c.dataset.i].domain)}
+function toggleAll(){document.querySelectorAll('#rows input:not([disabled])').forEach(c=>c.checked=all.checked)}
+async function sweep(){const d=selected();if(!d.length)return log("nothing selected");
+ log("Previewing "+d.length+" senders…");const p=await api('/api/sweep',{provider:provider.value,domains:d,execute:false});
+ if(p.error){log("error: "+p.error);return}
+ if(!confirm("Move "+p.total+" messages from "+d.length+" senders to Trash? (recoverable)"))return;
+ log("Moving…");const r=await api('/api/sweep',{provider:provider.value,domains:d,execute:true});
+ log(r.error?("error: "+r.error):("Moved "+r.moved+" messages to Trash."))}
+async function unsub(){const d=selected();if(!d.length)return log("nothing selected");
+ if(!confirm("Unsubscribe from "+d.length+" senders?"))return;log("Unsubscribing…");
+ const r=await api('/api/unsub',{provider:provider.value,domains:d});
+ if(r.error){log("error: "+r.error);return}r.results.forEach(x=>log("  "+x))}
+</script></body></html>"""
+
+
+def _unsub_domain(M, domain, addr, pw, smtp_box):
+    meth, tgt = E.unsub_method(M, domain)
+    if meth == "1click":
+        import requests
+        r = requests.post(tgt, data="List-Unsubscribe=One-Click",
+                          headers={"Content-Type": "application/x-www-form-urlencoded",
+                                   "User-Agent": "Mozilla/5.0"}, timeout=20)
+        return "%s — 1click HTTP %s" % (domain, r.status_code)
+    if meth == "mailto":
+        m = re.match(r"mailto:([^?]+)(\?(.*))?", tgt); to = m.group(1); subj = ""
+        for kv in (m.group(3) or "").split("&"):
+            if kv.lower().startswith("subject="):
+                subj = unquote(kv[8:])
+        if smtp_box[0] is None:
+            s = smtplib.SMTP(E.PROVIDERS[M._prov]["smtp"], 587); s.starttls(); s.login(addr, pw); smtp_box[0] = s
+        msg = MIMEText(""); msg["From"] = addr; msg["To"] = to; msg["Subject"] = subj or "unsubscribe"
+        smtp_box[0].sendmail(addr, [to], msg.as_string())
+        return "%s — mailto sent" % domain
+    if meth == "weblink":
+        return "%s — needs manual click (weblink): %s" % (domain, tgt[:50])
+    return "%s — no unsubscribe header" % domain
+
+
+class H(BaseHTTPRequestHandler):
+    def log_message(self, *a):
+        pass
+
+    def _send(self, code, body, ctype="application/json"):
+        b = body.encode() if isinstance(body, str) else body
+        self.send_response(code); self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(b))); self.end_headers(); self.wfile.write(b)
+
+    def do_GET(self):
+        if self.path.split("?")[0] == "/":
+            self._send(200, PAGE.replace("__TOKEN__", TOKEN), "text/html")
+        else:
+            self._send(404, "{}")
+
+    def do_POST(self):
+        if self.headers.get("X-Token") != TOKEN:
+            self._send(403, json.dumps({"error": "bad token"})); return
+        n = int(self.headers.get("Content-Length", 0))
+        req = json.loads(self.rfile.read(n) or b"{}")
+        prov = req.get("provider", "gmail")
+        try:
+            self._send(200, json.dumps(self.route(self.path, prov, req)))
+        except Exception as e:
+            self._send(200, json.dumps({"error": str(e)[:120]}))
+
+    def route(self, path, prov, req):
+        if path == "/api/connect":
+            addr, pw = req["addr"].strip(), req["pw"].replace(" ", "")
+            M = E.connect(prov, addr, pw, readonly=True); M.logout()
+            E.save_creds(prov, addr, pw)
+            return {"ok": True}
+        addr, pw = E.load_creds(prov)
+        if not (addr and pw):
+            return {"error": "not connected"}
+        if path == "/api/scan":
+            M = E.connect(prov, addr, pw, readonly=True)
+            dom = E.fetch_from(M, E.search_bulk(M))
+            out = []
+            for d, c in dom.most_common(30):
+                meth, _ = E.unsub_method(M, d)
+                out.append({"domain": d, "count": c, "method": meth, "protected": E._is_protected(d)})
+            M.logout()
+            return {"senders": out}
+        if path == "/api/sweep":
+            domains = [d for d in req["domains"] if not E._is_protected(d)]
+            if not req.get("execute"):
+                M = E.connect(prov, addr, pw, readonly=True)
+                total = sum(len(E.search_sender(M, d, 365)) for d in domains); M.logout()
+                return {"total": total}
+            M = E.connect(prov, addr, pw, readonly=False); moved = 0
+            for d in domains:
+                moved += E.move_to_trash(M, E.search_sender(M, d, 365))
+            M.logout()
+            return {"moved": moved}
+        if path == "/api/unsub":
+            M = E.connect(prov, addr, pw, readonly=True); box = [None]; res = []
+            for d in req["domains"]:
+                if E._is_protected(d):
+                    res.append("%s — protected, skipped" % d); continue
+                try:
+                    res.append(_unsub_domain(M, d, addr, pw, box))
+                except Exception as e:
+                    res.append("%s — ERR %s" % (d, str(e)[:40]))
+            if box[0]:
+                box[0].quit()
+            M.logout()
+            return {"results": res}
+        return {"error": "unknown endpoint"}
+
+
+def serve(port=8765):
+    for p in range(port, port + 20):
+        try:
+            httpd = ThreadingHTTPServer(("127.0.0.1", p), H)
+            break
+        except OSError:
+            continue
+    else:
+        raise SystemExit("no free port")
+    url = "http://127.0.0.1:%d/?t=%s" % (p, TOKEN)
+    print("Mail Declutter UI running at:\n  %s\n(Press Ctrl+C to stop.)" % url)
+    threading.Timer(0.6, lambda: webbrowser.open(url)).start()
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nstopped.")
+
+
+if __name__ == "__main__":
+    serve()

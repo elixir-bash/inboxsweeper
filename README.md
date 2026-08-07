@@ -19,6 +19,22 @@ command; no coding and no AI agent required.
 
 ---
 
+## 🖱️ Easiest: the app (no terminal)
+
+Prefer clicking to typing? After a one-time `pip install -r requirements.txt`:
+
+- **macOS:** double-click **`Declutter.command`**
+- **Windows:** double-click **`Declutter.bat`**
+
+It opens a small app in your browser: pick Gmail or Yahoo, paste an app password once, hit
+**Scan**, then tick the senders you want gone and click **Move to Trash** or **Unsubscribe**.
+Everything runs locally on your machine (nothing is uploaded anywhere), and deletions go to
+Trash so they're recoverable. (Prefer the command line? `python3 gmail_cleanup.py serve` does
+the same thing.)
+
+> Standalone signed `.app` / `.exe` installers (no Python needed) are planned — for now the
+> double-click launchers need Python installed once.
+
 ## ⭐ Quick start (guided — no flags to remember)
 
 If you just want a clean inbox and don't care how it works:
