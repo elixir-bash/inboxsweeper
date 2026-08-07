@@ -19,21 +19,30 @@ command; no coding and no AI agent required.
 
 ---
 
-## 🖱️ Easiest: the app (no terminal)
+## 🖱️ Easiest: the app (for non-coders)
 
-Prefer clicking to typing? After a one-time `pip install -r requirements.txt`:
+Three one-time steps, then it's just double-click. No commands to memorize.
 
-- **macOS:** double-click **`InboxSweeper.command`**
-- **Windows:** double-click **`InboxSweeper.bat`**
+**Step 1 — Get the files.** On the [GitHub page](https://github.com/elixir-bash/inboxsweeper),
+click the green **Code** button → **Download ZIP**. Unzip it (double-click the download).
 
-It opens a small app in your browser: pick Gmail or Yahoo, paste an app password once, hit
-**Scan**, then tick the senders you want gone and click **Move to Trash** or **Unsubscribe**.
-Everything runs locally on your machine (nothing is uploaded anywhere), and deletions go to
-Trash so they're recoverable. (Prefer the command line? `python3 inboxsweeper.py serve` does
-the same thing.)
+**Step 2 — Install Python** *(skip if you already have it).* It's a free one-time install from
+[python.org/downloads](https://www.python.org/downloads/). On **Windows**, tick
+**"Add Python to PATH"** in the installer.
 
-> Standalone signed `.app` / `.exe` installers (no Python needed) are planned — for now the
-> double-click launchers need Python installed once.
+**Step 3 — Open the app.** Inside the unzipped folder:
+- **macOS:** double-click **`InboxSweeper.command`**. The first time only, macOS may warn it's
+  from an "unidentified developer" — **right-click the file → Open → Open** to allow it.
+- **Windows:** double-click **`InboxSweeper.bat`**.
+
+It sets itself up and opens a small app in your **web browser**. From there it's all clicking:
+pick Gmail or Yahoo, paste an app password once (it shows you exactly how to get one), press
+**Scan**, tick the junk senders, and hit **Move to Trash** or **Unsubscribe**. Everything runs
+on your own computer — nothing is uploaded — and deletions go to Trash, so they're recoverable.
+
+> **Want truly zero setup (no ZIP, no Python)?** A signed one-click installer is on the roadmap —
+> that's the real grandma-proof version. Until it lands, the three steps above are the way in.
+> (If you already use the terminal, `python3 inboxsweeper.py serve` opens the same app.)
 
 ## ⭐ Quick start (guided — no flags to remember)
 

@@ -232,6 +232,76 @@ def add_blocklist(provider, domains):
     return sorted(cur)
 
 
+# ---------------------------------------------------- anonymous telemetry ------
+# Off unless a stats endpoint is configured. Sends counts only — never addresses,
+# senders, subjects, or content. Disable entirely with INBOXSWEEPER_NO_TELEMETRY=1.
+STATS_URL = os.environ.get("INBOXSWEEPER_STATS_URL", "")
+
+
+def _anon_uid():
+    p = os.path.expanduser("~/.config/mail-declutter/uid")
+    if os.path.exists(p):
+        return open(p).read().strip()
+    import uuid
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    u = uuid.uuid4().hex
+    open(p, "w").write(u)
+    return u
+
+
+def track(action, provider, emails=0, size_bytes=0, unsubs=0):
+    if not STATS_URL or os.environ.get("INBOXSWEEPER_NO_TELEMETRY"):
+        return
+    try:
+        import json as _j, urllib.request as _u
+        body = _j.dumps({"uid": _anon_uid(), "tool": "inboxsweeper", "action": action,
+                         "provider": provider, "emails": emails,
+                         "mb": round(size_bytes / 1048576.0, 1), "unsubs": unsubs}).encode()
+        _u.urlopen(_u.Request(STATS_URL.rstrip("/") + "/event", data=body,
+                              headers={"Content-Type": "application/json"}), timeout=4)
+    except Exception:
+        pass
+
+
+# ------------------------------------------------------- quarterly reminder ----
+_REMIND_TAG = "# inboxsweeper-reminder"
+
+
+def cmd_remind(off=False):
+    self_path = os.path.abspath(sys.argv[0])
+    run = "%s %s remind-run" % (sys.executable, self_path)
+    if sys.platform == "win32":
+        print("Windows: open Task Scheduler and create a quarterly task running:\n  %s" % run)
+        return
+    cur = subprocess.run(["crontab", "-l"], capture_output=True, text=True).stdout
+    lines = [l for l in cur.splitlines() if _REMIND_TAG not in l]
+    if off:
+        print("Quarterly reminder removed.")
+    else:
+        # 9am on the 1st of Jan/Apr/Jul/Oct
+        lines.append("0 9 1 1,4,7,10 * %s %s" % (run, _REMIND_TAG))
+        print("Quarterly reminder installed — you'll get a nudge (and blocked senders auto-clean)"
+              "\n  at 9am on Jan/Apr/Jul/Oct 1st. Turn off with:  remind --off")
+    subprocess.run(["crontab", "-"], input="\n".join(lines) + "\n", text=True)
+
+
+def cmd_remind_run(provider):
+    msg = "Time for your quarterly inbox sweep - open InboxSweeper to tidy up."
+    try:
+        if sys.platform == "darwin":
+            subprocess.run(["osascript", "-e", 'display notification "%s" with title "InboxSweeper"' % msg])
+        elif sys.platform.startswith("linux"):
+            subprocess.run(["notify-send", "InboxSweeper", msg])
+    except Exception:
+        pass
+    try:  # keep pre-approved blocked senders swept (safe — user already blocked them)
+        addr, pw = load_creds(provider)
+        if addr and pw and load_blocklist(provider):
+            cmd_autoclean(provider, addr, pw, yes=True)
+    except Exception:
+        pass
+
+
 # ---------------------------------------------------------- creds bootstrap ----
 def ensure_creds(provider, interactive=True):
     addr, pw = load_creds(provider)
@@ -326,6 +396,7 @@ def cmd_sweep(provider, addr, pw, senders, days, yes):
         print("  moved %s (%d)" % (dom, len(uids)))
     print("DONE. Moved %d messages to %s — freed ~%s (30-day recovery)." % (moved, M._trash, human(freed)))
     M.logout()
+    track("sweep", provider, emails=moved, size_bytes=freed)
     return (moved, freed)
 
 
@@ -427,8 +498,16 @@ def main():
     x.add_argument("--senders", required=True); x.add_argument("--yes", action="store_true")
     x = sub.add_parser("autoclean", help="re-clean every blocked sender (great for a cron job)")
     x.add_argument("--yes", action="store_true")
+    x = sub.add_parser("remind", help="install a quarterly reminder to clean your inbox")
+    x.add_argument("--off", action="store_true")
+    sub.add_parser("remind-run", help=argparse.SUPPRESS)
     a = p.parse_args()
     prov = a.provider
+
+    if a.cmd == "remind":
+        cmd_remind(a.off); return
+    if a.cmd == "remind-run":
+        cmd_remind_run(prov); return
 
     if a.cmd == "serve":
         import webui; webui.serve(); return
