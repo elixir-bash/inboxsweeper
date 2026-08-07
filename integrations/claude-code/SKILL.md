@@ -1,11 +1,11 @@
 ---
-name: gmail-declutter
+name: inboxsweeper
 description: Clean up and unsubscribe from a personal Gmail over IMAP using an app password (macOS Keychain or env vars). Bulk-delete promotional/newsletter mail to Bin (30-day recovery, never permanent), profile noisy senders, and unsubscribe via RFC-8058 one-click or mailto. Use when the user wants to declutter Gmail, mass-delete promotions/updates, stop newsletters, or unsubscribe from mailing lists. Trigger words - gmail cleanup, declutter inbox, delete promotions, mass delete email, unsubscribe, newsletters, inbox zero.
 ---
 
 # Gmail Declutter (skill)
 
-Runs the `gmail_cleanup.py` CLI co-located in this skill folder. **Read `RULESET.md` (same
+Runs the `inboxsweeper.py` CLI co-located in this skill folder. **Read `RULESET.md` (same
 folder) before any delete or unsubscribe.**
 
 ## Setup (one time)
@@ -20,12 +20,12 @@ folder) before any delete or unsubscribe.**
 
 ## Commands
 ```
-python3 gmail_cleanup.py counts
-python3 gmail_cleanup.py profile   --top 40
-python3 gmail_cleanup.py unsub-list --top 40
-python3 gmail_cleanup.py sweep     --query "<gmail query>"          # DRY RUN
-python3 gmail_cleanup.py sweep     --query "<gmail query>" --yes    # → Bin
-python3 gmail_cleanup.py unsub-run --domains "a.com,b.com"
+python3 inboxsweeper.py counts
+python3 inboxsweeper.py profile   --top 40
+python3 inboxsweeper.py unsub-list --top 40
+python3 inboxsweeper.py sweep     --query "<gmail query>"          # DRY RUN
+python3 inboxsweeper.py sweep     --query "<gmail query>" --yes    # → Bin
+python3 inboxsweeper.py unsub-run --domains "a.com,b.com"
 ```
 
 ## How to operate (follow RULESET.md)

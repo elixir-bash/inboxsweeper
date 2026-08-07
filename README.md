@@ -1,4 +1,4 @@
-# gmail-declutter
+# inboxsweeper
 
 Safe inbox cleanup **and** unsubscribe for **Gmail and Yahoo** over IMAP — no API project, no
 OAuth consent screen, no browser extension. Just an app password. Run it with one guided
@@ -23,13 +23,13 @@ command; no coding and no AI agent required.
 
 Prefer clicking to typing? After a one-time `pip install -r requirements.txt`:
 
-- **macOS:** double-click **`Declutter.command`**
-- **Windows:** double-click **`Declutter.bat`**
+- **macOS:** double-click **`InboxSweeper.command`**
+- **Windows:** double-click **`InboxSweeper.bat`**
 
 It opens a small app in your browser: pick Gmail or Yahoo, paste an app password once, hit
 **Scan**, then tick the senders you want gone and click **Move to Trash** or **Unsubscribe**.
 Everything runs locally on your machine (nothing is uploaded anywhere), and deletions go to
-Trash so they're recoverable. (Prefer the command line? `python3 gmail_cleanup.py serve` does
+Trash so they're recoverable. (Prefer the command line? `python3 inboxsweeper.py serve` does
 the same thing.)
 
 > Standalone signed `.app` / `.exe` installers (no Python needed) are planned — for now the
@@ -42,8 +42,8 @@ If you just want a clean inbox and don't care how it works:
 ```bash
 pip install -r requirements.txt
 
-python3 gmail_cleanup.py wizard                    # Gmail
-python3 gmail_cleanup.py wizard --provider yahoo   # Yahoo
+python3 inboxsweeper.py wizard                    # Gmail
+python3 inboxsweeper.py wizard --provider yahoo   # Yahoo
 ```
 
 The wizard walks you through everything, in plain language:
@@ -73,12 +73,12 @@ That's the whole journey. Everything below is for people who want the individual
 ## 2. Create a Gmail app password (step by step)
 
 You never give this tool your real Google password. You create a scoped **app password**.
-(Or skip this section entirely and let `python3 gmail_cleanup.py setup` walk you through it.)
+(Or skip this section entirely and let `python3 inboxsweeper.py setup` walk you through it.)
 
 1. Turn on 2-Step Verification: **[myaccount.google.com/security](https://myaccount.google.com/security)**
    → *2-Step Verification* → follow the steps. (App passwords don't exist without it.)
 2. Go to **[myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)**.
-3. App name: `gmail-declutter` → **Create**.
+3. App name: `inboxsweeper` → **Create**.
 4. Google shows a **16-character** password like `abcd efgh ijkl mnop`. Copy it.
    (You can always revoke it later from that same page — the tool stops working instantly.)
 5. IMAP is already enabled on modern Gmail (no toggle). If you have an old account:
@@ -106,20 +106,20 @@ The tool checks env vars first, then Keychain.
 
 ```bash
 # 1. See where the noise is
-python3 gmail_cleanup.py counts
+python3 inboxsweeper.py counts
 
 # 2. Rank the noisiest bulk senders (default query = the safe bulk set)
-python3 gmail_cleanup.py profile --top 40
+python3 inboxsweeper.py profile --top 40
 
 # 3. Preview a deletion (DRY RUN — nothing moves)
-python3 gmail_cleanup.py sweep --query "older_than:1y unsubscribe from:linkedin.com"
+python3 inboxsweeper.py sweep --query "older_than:1y unsubscribe from:linkedin.com"
 
 # 4. Actually move them to Bin (30-day recovery)
-python3 gmail_cleanup.py sweep --query "older_than:1y unsubscribe from:linkedin.com" --yes
+python3 inboxsweeper.py sweep --query "older_than:1y unsubscribe from:linkedin.com" --yes
 
 # 5. See each sender's unsubscribe method, then unsubscribe from specific ones
-python3 gmail_cleanup.py unsub-list --top 40
-python3 gmail_cleanup.py unsub-run --domains "email-marriott.com,mail.zillow.com,uber.com"
+python3 inboxsweeper.py unsub-list --top 40
+python3 inboxsweeper.py unsub-run --domains "email-marriott.com,mail.zillow.com,uber.com"
 ```
 
 ### Commands
@@ -166,8 +166,8 @@ This repo ships ready-made instructions so an AI coding agent can drive the tool
 
 - **Claude Code** — install as a skill (bundles the script + ruleset so it's self-contained):
   ```bash
-  mkdir -p ~/.claude/skills/gmail-declutter
-  cp integrations/claude-code/SKILL.md gmail_cleanup.py RULESET.md ~/.claude/skills/gmail-declutter/
+  mkdir -p ~/.claude/skills/inboxsweeper
+  cp integrations/claude-code/SKILL.md inboxsweeper.py RULESET.md ~/.claude/skills/inboxsweeper/
   ```
   Then just ask Claude: *"declutter my gmail"* / *"unsubscribe from these senders"*.
 - **Codex / other agents** — point the agent at [`AGENTS.md`](AGENTS.md) (or drop it at your
