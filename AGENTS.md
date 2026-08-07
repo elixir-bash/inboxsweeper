@@ -4,7 +4,7 @@ Instructions for Codex, Claude Code, or any tool-using agent to operate this rep
 
 ## What this is
 A Python IMAP tool that cleans up and unsubscribes from a personal Gmail. `inboxsweeper.py`
-is the entrypoint. Read `RULESET.md` before deleting or unsubscribing anything.
+is the entrypoint. Read the built-in safety rules before deleting or unsubscribing anything.
 
 ## Credentials
 Do NOT ask the user to paste their password into chat. Credentials come from:
@@ -24,7 +24,7 @@ Keychain or env vars. The value must never appear in the transcript.
    `weblink` unsubscribe automatically, and never unsubscribe from suspected spam — advise
    "report spam" instead.
 5. **Protect** financial, security, government, transactional, personal, and work senders
-   (see `RULESET.md`). When a sender is ambiguous (community/religious/hobby), ask the user.
+   (see the built-in safety rules). When a sender is ambiguous (community/religious/hobby), ask the user.
 
 ## Recommended flow
 ```bash

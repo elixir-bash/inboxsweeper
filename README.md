@@ -13,7 +13,7 @@ your email is never uploaded anywhere. Deleted mail goes to Trash, so you can al
 - ♻️ **Safe** — deletions go to Trash (recoverable), and bank, security, and government email is protected automatically.
 - 🖱️ **Three ways to use it** — a click-through app, the terminal, or your AI assistant (Claude / Codex).
 
-> ⚠️ **Read [`RULESET.md`](RULESET.md) before you run a sweep.** The one rule that matters
+> ⚠️ **Read the built-in safety rules before you run a sweep.** The one rule that matters
 > most: **recognize a sender → unsubscribe; don't recognize it → report spam, never
 > unsubscribe.** Clicking unsubscribe on real spam confirms your address is live and gets
 > you *more* spam.
@@ -159,7 +159,7 @@ python3 inboxsweeper.py unsub-run --domains "email-marriott.com,mail.zillow.com,
 | `unsub-run --domains a.com,b.com` | Execute unsubscribe (one-click POST or mailto/SMTP) |
 
 Add `--provider gmail` (default) or `--provider yahoo` to any command. `sweep` targets by
-**sender** (the safe way — see [`RULESET.md`](RULESET.md)); omit `--senders` to target every
+**sender** (the safe way — see the built-in safety rules); omit `--senders` to target every
 non-protected bulk sender. Protected senders (financial/security/gov/transactional) are always
 skipped.
 
@@ -167,7 +167,7 @@ skipped.
 
 1. `counts` → find the mass (often it's `category:updates`, which hides receipts).
 2. `profile` → rank bulk senders.
-3. Classify each into **PROTECT / DELETE / KEEP-BY-DEFAULT** using [`RULESET.md`](RULESET.md).
+3. Classify each into **PROTECT / DELETE / KEEP-BY-DEFAULT** using the built-in safety rules.
 4. `sweep` (dry-run → `--yes`) the DELETE set. Verify a sample in Gmail → Bin.
 5. `unsub-list` → `unsub-run` the recognized DELETE senders.
 6. Unrecognized/spammy senders: **report spam in Gmail — don't unsubscribe.**
@@ -191,7 +191,7 @@ This repo ships ready-made instructions so an AI coding agent can drive the tool
 - **Claude Code** — install as a skill (bundles the script + ruleset so it's self-contained):
   ```bash
   mkdir -p ~/.claude/skills/inboxsweeper
-  cp integrations/claude-code/SKILL.md inboxsweeper.py RULESET.md ~/.claude/skills/inboxsweeper/
+  cp integrations/claude-code/SKILL.md inboxsweeper.py the built-in safety rules ~/.claude/skills/inboxsweeper/
   ```
   Then just ask Claude: *"declutter my gmail"* / *"unsubscribe from these senders"*.
 - **Codex / other agents** — point the agent at [`AGENTS.md`](AGENTS.md) (or drop it at your

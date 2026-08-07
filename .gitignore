@@ -20,3 +20,6 @@ venv/
 build/
 dist/
 *.spec
+
+# private backend infra (deployed separately)
+worker/

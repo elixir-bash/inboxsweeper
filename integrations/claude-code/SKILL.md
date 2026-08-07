@@ -5,7 +5,7 @@ description: Clean up and unsubscribe from a personal Gmail over IMAP using an a
 
 # Gmail Declutter (skill)
 
-Runs the `inboxsweeper.py` CLI co-located in this skill folder. **Read `RULESET.md` (same
+Runs the `inboxsweeper.py` CLI co-located in this skill folder. **Read the built-in safety rules (same
 folder) before any delete or unsubscribe.**
 
 ## Setup (one time)
@@ -28,7 +28,7 @@ python3 inboxsweeper.py sweep     --query "<gmail query>" --yes    # → Bin
 python3 inboxsweeper.py unsub-run --domains "a.com,b.com"
 ```
 
-## How to operate (follow RULESET.md)
+## How to operate (follow the built-in safety rules)
 1. `counts` → find the mass. `profile` → rank senders.
 2. Classify senders PROTECT / DELETE / KEEP-BY-DEFAULT; confirm the DELETE set with the user.
 3. `sweep` dry-run → show count → `--yes` to move to Bin (reversible). Verify a sample.
