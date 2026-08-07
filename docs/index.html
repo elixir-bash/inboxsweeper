@@ -197,7 +197,7 @@ python3 inboxsweeper.py wizard --provider yahoo</code>
 <script>
 // Set this to your deployed Worker URL to turn on the live counter + this feedback form,
 // e.g. "https://inboxsweeper-backend.<you>.workers.dev". Until then, the GitHub links work.
-const WORKER_URL = "";
+const WORKER_URL = "https://inboxsweeper-backend.elixir-bash.workers.dev";
 async function sendFeedback(){
   const msg=document.getElementById('fb').value.trim(), st=document.getElementById('fb-status');
   if(msg.length<3){st.textContent="Write a little more first.";return}
