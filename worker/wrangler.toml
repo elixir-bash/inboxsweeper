@@ -1,11 +1,12 @@
 name = "inboxsweeper-backend"
 main = "index.js"
 compatibility_date = "2024-11-01"
+workers_dev = true
 
 # Anonymous counters. Create with:  wrangler kv namespace create STATS
 # then paste the returned id below.
 kv_namespaces = [
-  { binding = "STATS", id = "PASTE_KV_NAMESPACE_ID_HERE" }
+  { binding = "STATS", id = "e7fe7ab4338840b480c9b18daccd852e" }
 ]
 
 [vars]

@@ -205,6 +205,14 @@ The tool never permanently deletes and never clicks arbitrary web links.
 **Does it work with non-Gmail IMAP?** It's built for Gmail (uses `X-GM-RAW` and Gmail
 categories). Other providers need query changes.
 
+## Anonymous usage stats
+
+To show how many people we've helped — and to catch problems — the tool sends **anonymous
+counters**: a random install ID, your OS, the tool version, and totals (emails cleaned, MB
+freed, unsubscribes). It **never** sends your email address, senders, subjects, or any message
+content — your mail still never leaves your machine. Turn it off completely with
+`INBOXSWEEPER_NO_TELEMETRY=1`. The live totals appear on the [website](https://elixir-bash.github.io/inboxsweeper/).
+
 ## Security
 
 - Uses an **app password**, never your Google password. Revoke it anytime at

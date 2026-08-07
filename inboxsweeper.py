@@ -235,7 +235,8 @@ def add_blocklist(provider, domains):
 # ---------------------------------------------------- anonymous telemetry ------
 # Off unless a stats endpoint is configured. Sends counts only — never addresses,
 # senders, subjects, or content. Disable entirely with INBOXSWEEPER_NO_TELEMETRY=1.
-STATS_URL = os.environ.get("INBOXSWEEPER_STATS_URL", "")
+STATS_URL = os.environ.get("INBOXSWEEPER_STATS_URL",
+                           "https://inboxsweeper-backend.elixir-bash.workers.dev")
 
 
 def _anon_uid():
