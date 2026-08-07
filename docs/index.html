@@ -96,6 +96,7 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
     <div class="feat"><h4>🛡️ Protects what matters</h4><p>Financial, security, government and transactional senders are shielded automatically.</p></div>
     <div class="feat"><h4>🚫 Block senders</h4><p>Block a sender once and their mail is swept automatically from then on — set it and forget it.</p></div>
     <div class="feat"><h4>💾 See storage freed</h4><p>Watch the gigabytes come back. Every sweep reports exactly how much space you reclaimed.</p></div>
+    <div class="feat"><h4>🔔 Quarterly reminders</h4><p>Opt in and it nudges you every three months — and auto-sweeps your blocked senders — so your inbox never piles up again.</p></div>
     <div class="feat"><h4>🖱️ App or terminal</h4><p>Double-click to open a local browser app — or drive it from the command line. Your call.</p></div>
     <div class="feat"><h4>🤖 Agent-ready</h4><p>Ships with skills for Claude Code &amp; Codex, so your AI assistant can clean your inbox for you.</p></div>
   </div>
@@ -145,20 +146,40 @@ python3 inboxsweeper.py wizard --provider yahoo</code>
   <p class="muted" style="margin-top:14px">On macOS you can also just double-click <span class="mono">InboxSweeper.command</span> (or <span class="mono">InboxSweeper.bat</span> on Windows).</p>
   <h3 style="margin-top:28px">On the roadmap</h3>
   <ul class="roadmap">
-    <li>Storage reclaimed — see the GBs you free up</li>
-    <li>Block a sender &amp; auto-clean on a schedule</li>
     <li>Archive / mark-as-read as alternatives to Trash</li>
-    <li>Signed one-click <span class="mono">.app</span> / <span class="mono">.exe</span> installers</li>
+    <li>Signed one-click <span class="mono">.app</span> / <span class="mono">.exe</span> installers (no Python needed)</li>
+    <li>More free everyday tools under the same roof</li>
   </ul>
+</section>
+
+<section id="impact" style="text-align:center">
+  <h2>The counter</h2>
+  <p class="muted">Every sweep is counted anonymously (no addresses, no content) so we can show
+   what we've cleared together.</p>
+  <p id="impact-line" class="lead" style="margin-top:16px">Join the first people cleaning their
+   inbox, privately.</p>
 </section>
 
 <section id="feedback">
   <h2>Feedback &amp; questions</h2>
-  <p class="muted">Tell us what to build next, report a bug, or just say hi. Everything posts to
-   GitHub so we can reply — no email required beyond a GitHub sign-in for the comment box.</p>
-  <div class="cta" style="justify-content:flex-start;margin:16px 0 8px">
-    <a class="btn" href="https://github.com/elixir-bash/inboxsweeper/discussions/new?category=q-a" target="_blank">💬 Ask a question</a>
-    <a class="btn ghost" href="https://github.com/elixir-bash/inboxsweeper/issues/new?labels=feedback&template=&title=Feedback:%20" target="_blank">🐛 Report a bug / request a feature</a>
+  <p class="muted">Tell us what to build next, report a bug, or just say hi — no account needed.</p>
+  <div class="feat" style="margin-top:14px">
+    <label for="fb" style="display:block;color:#9aa4b2;font-size:13px;margin-bottom:6px">Your message</label>
+    <textarea id="fb" rows="4" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3240;background:#0f141c;color:#e6e6e6;box-sizing:border-box" placeholder="What would make this better?"></textarea>
+    <input id="fb-contact" placeholder="Email or @handle (optional, if you'd like a reply)" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid #2a3240;background:#0f141c;color:#e6e6e6;box-sizing:border-box">
+    <input id="fb-website" style="display:none" tabindex="-1" autocomplete="off">
+    <button class="btn" style="margin-top:12px" onclick="sendFeedback()">Send feedback</button>
+    <span id="fb-status" class="muted" style="margin-left:10px;font-size:13px"></span>
+    <p class="muted" style="font-size:13px;margin-top:12px">Prefer GitHub?
+      <a href="https://github.com/elixir-bash/inboxsweeper/discussions/new?category=q-a" target="_blank">Ask a question</a> ·
+      <a href="https://github.com/elixir-bash/inboxsweeper/issues/new?labels=feedback&template=&title=Feedback:%20" target="_blank">Open an issue</a>
+    </p>
+  </div>
+  <div class="feat" style="margin-top:18px">
+    <div class="giscus"></div>
+    <p class="muted" id="giscus-fallback" style="font-size:13px;margin-top:10px">
+      Loading comments… If this stays empty, the maintainer just needs to finish a one-time setup.
+    </p>
   </div>
   <div class="feat" style="margin-top:18px">
     <div class="giscus"></div>
@@ -172,6 +193,35 @@ python3 inboxsweeper.py wizard --provider yahoo</code>
   Made for people who want their inbox back. · <a href="https://github.com/elixir-bash/inboxsweeper">GitHub</a> · MIT License<br>
   Your mail stays yours — nothing here ever leaves your machine.
 </footer>
+
+<script>
+// Set this to your deployed Worker URL to turn on the live counter + this feedback form,
+// e.g. "https://inboxsweeper-backend.<you>.workers.dev". Until then, the GitHub links work.
+const WORKER_URL = "";
+async function sendFeedback(){
+  const msg=document.getElementById('fb').value.trim(), st=document.getElementById('fb-status');
+  if(msg.length<3){st.textContent="Write a little more first.";return}
+  if(!WORKER_URL){st.textContent="Use the GitHub links below for now.";return}
+  st.textContent="Sending…";
+  try{
+    const r=await fetch(WORKER_URL.replace(/\/$/,'')+"/feedback",{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:msg,contact:document.getElementById('fb-contact').value,
+        website:document.getElementById('fb-website').value,tool:'inboxsweeper'})});
+    const d=await r.json();
+    st.textContent=d.ok?"Thanks — got it! 🙌":("Hmm: "+(d.error||"try again"));
+    if(d.ok){document.getElementById('fb').value="";document.getElementById('fb-contact').value="";}
+  }catch(e){st.textContent="Network error — try the GitHub links below."}
+}
+(async function(){
+  if(!WORKER_URL)return;
+  try{
+    const s=await (await fetch(WORKER_URL.replace(/\/$/,'')+"/stats")).json();
+    if((s.users||0)>0) document.getElementById('impact-line').innerHTML=
+      "<b>"+s.emails.toLocaleString()+"</b> emails swept · <b>"+s.gb+" GB</b> freed · <b>"+
+      s.unsubs.toLocaleString()+"</b> unsubscribes — for <b>"+s.users.toLocaleString()+"</b> people.";
+  }catch(e){}
+})();
+</script>
 
 <script src="https://giscus.app/client.js"
   data-repo="elixir-bash/inboxsweeper"
