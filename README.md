@@ -1,7 +1,8 @@
 # gmail-declutter
 
-Safe, scriptable Gmail cleanup **and** unsubscribe over IMAP — no Google Cloud project, no
-OAuth consent screen, no browser extension. Just an app password.
+Safe inbox cleanup **and** unsubscribe for **Gmail and Yahoo** over IMAP — no API project, no
+OAuth consent screen, no browser extension. Just an app password. Run it with one guided
+command; no coding and no AI agent required.
 
 - 🗑️ **Deletes to Bin, never permanently** (30-day recovery). Reversible by design.
 - 🎯 **Cleans by sender, not by category** — because Gmail's "Updates" tab is full of
@@ -18,15 +19,45 @@ OAuth consent screen, no browser extension. Just an app password.
 
 ---
 
+## ⭐ Quick start (guided — no flags to remember)
+
+If you just want a clean inbox and don't care how it works:
+
+```bash
+pip install -r requirements.txt
+
+python3 gmail_cleanup.py wizard                    # Gmail
+python3 gmail_cleanup.py wizard --provider yahoo   # Yahoo
+```
+
+The wizard walks you through everything, in plain language:
+1. If it's your first run, it prints the exact steps to create an **app password** and asks
+   you to paste it once (hidden). It's stored securely (macOS Keychain, or a locked file).
+2. It scans your mailbox and shows your noisiest bulk senders.
+3. It asks — in y/N prompts — whether to move that old mail to **Trash** (recoverable) and
+   whether to **unsubscribe**. Nothing happens without your yes, and it always previews counts
+   before moving anything.
+
+That's the whole journey. Everything below is for people who want the individual commands.
+
+---
+
 ## 1. Prerequisites
 
 - Python 3.9+
 - `pip install -r requirements.txt` (only `requests`, and only for `unsub-run`)
-- A Gmail account with **2-Step Verification ON** (required for app passwords)
+- A **Gmail or Yahoo** account with **2-Step Verification ON** (required for app passwords)
+
+> **Yahoo users:** the flow is identical — create the app password at
+> [login.yahoo.com/account/security](https://login.yahoo.com/account/security) → *Create app
+> password* under "External connections", confirm IMAP is on (Yahoo Mail → Settings → More
+> Settings → Mailboxes), then use `--provider yahoo` on any command. The `setup`/`wizard`
+> commands print these steps for you.
 
 ## 2. Create a Gmail app password (step by step)
 
 You never give this tool your real Google password. You create a scoped **app password**.
+(Or skip this section entirely and let `python3 gmail_cleanup.py setup` walk you through it.)
 
 1. Turn on 2-Step Verification: **[myaccount.google.com/security](https://myaccount.google.com/security)**
    → *2-Step Verification* → follow the steps. (App passwords don't exist without it.)
@@ -79,15 +110,18 @@ python3 gmail_cleanup.py unsub-run --domains "email-marriott.com,mail.zillow.com
 
 | Command | Purpose |
 |---|---|
-| `counts` | Landscape: promotions / social / updates / forums / safe-bulk-set sizes |
-| `profile --query Q --top N` | Tally sender domains for a query |
-| `unsub-list --query Q --top N` | Senders + unsubscribe method (`1click`/`mailto`/`weblink`/`none`) |
-| `sweep --query Q [--batch 300] [--yes]` | Move matches to Bin. **Dry-run unless `--yes`.** |
+| `wizard` | **Start here.** Guided end-to-end: setup → scan → confirm → clean → unsubscribe |
+| `setup` | Store credentials for a provider (prints the app-password steps) |
+| `counts` | Landscape of your mailbox (sizes by category / bulk) |
+| `profile --top N` | Tally the noisiest bulk senders |
+| `unsub-list --top N` | Senders + unsubscribe method (`1click`/`mailto`/`weblink`/`none`) |
+| `sweep [--senders a.com,b.com] [--days 365] [--yes]` | Move a sender's old mail to Trash. **Dry-run unless `--yes`.** |
 | `unsub-run --domains a.com,b.com` | Execute unsubscribe (one-click POST or mailto/SMTP) |
 
-The default `--query` everywhere is the **safe bulk set**: old mail that carries an
-unsubscribe link, excluding starred/important, transactional keywords, and protected
-senders. Widen or narrow it with any [Gmail search operators](https://support.google.com/mail/answer/7190).
+Add `--provider gmail` (default) or `--provider yahoo` to any command. `sweep` targets by
+**sender** (the safe way — see [`RULESET.md`](RULESET.md)); omit `--senders` to target every
+non-protected bulk sender. Protected senders (financial/security/gov/transactional) are always
+skipped.
 
 ## 5. Recommended flow
 
