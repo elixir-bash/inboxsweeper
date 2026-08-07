@@ -45,6 +45,18 @@ PROVIDERS = {
 # safety defaults (apply to every provider)
 PROTECT_SENDERS = ["google.com", "gmail.com", "yahoo.com", "amazon.com", "amazon.in",
                    "github.com", "apple.com", "microsoft.com", "paypal.com", "gov.in", "nic.in"]
+# Substrings that mark a sender as financial / security / sensitive → never auto-classified as junk.
+# Banks and fintechs now add unsubscribe headers even to important mail, so "has unsubscribe"
+# is NOT a safe "junk" signal — this shields them.
+PROTECT_DOMAIN_KW = ["bank", "amex", "americanexpress", "experian", "equifax", "transunion",
+                     "venmo", "paypal", "visa", "mastercard", "discover", "cred.club", "creditkarma",
+                     "wazirx", "coinbase", "binance", "kraken", "invest", "capital", "securit",
+                     "trading", "mutualfund", "brokerage", "nse", "bse", "sensex", "insur",
+                     "hdfc", "icici", "sbi", "kotak", "citi", "chase", "wellsfargo", "hsbc",
+                     "fidelity", "schwab", "wealthfront", "robinhood", "motilaloswal", "zerodha",
+                     "groww", "irs", ".gov", ".gc.ca", "vanguard", "biltrewards",
+                     "mutual", "tatamf", "quant.in", "depositor", "nsdl", "cdsl", "kfin",
+                     "registrar", "registry", "axisdirect", "kp.org", "health"]
 PROTECT_KW = ["receipt", "invoice", "order", "booking", "reservation", "ticket",
               "statement", "tax", "refund", "payment", "confirmation"]
 
@@ -137,15 +149,15 @@ def _imap_search(M, criteria):
 
 
 def _has_unsub(M, uids):
-    """Keep only UIDs whose message carries a List-Unsubscribe header (client-side, works anywhere)."""
+    """Keep UIDs whose message carries a List-Unsubscribe header. Fetches the FULL header block —
+    Yahoo's IMAP returns empty for HEADER.FIELDS(List-Unsubscribe), so a field-scoped fetch misses everything."""
     keep = []
-    for i in range(0, len(uids), 400):
-        t, d = M.uid('fetch', b','.join(uids[i:i + 400]),
-                     '(UID BODY.PEEK[HEADER.FIELDS (List-Unsubscribe)])')
+    for i in range(0, len(uids), 200):
+        t, d = M.uid('fetch', b','.join(uids[i:i + 200]), '(UID BODY.PEEK[HEADER])')
         for it in d or []:
             if isinstance(it, tuple):
                 m = re.search(rb'UID (\d+)', it[0])
-                if m and b'unsubscribe' in it[1].lower():
+                if m and b'list-unsubscribe:' in it[1].lower():
                     keep.append(m.group(1))
     return keep
 
@@ -199,10 +211,15 @@ def unsub_method(M, domain):
         ids = search_sender(M, domain, days=1000)
     if not ids:
         return ('none', '')
-    t, h = M.uid('fetch', ids[-1], '(BODY.PEEK[HEADER.FIELDS (List-Unsubscribe List-Unsubscribe-Post)])')
-    hdr = ''.join(x[1].decode('utf-8', 'ignore') for x in h if isinstance(x, tuple))
-    lu = re.findall(r'<([^>]+)>', hdr)
-    oc = 'One-Click' in hdr
+    # Full header (Yahoo returns empty for HEADER.FIELDS of List-Unsubscribe).
+    t, h = M.uid('fetch', ids[-1], '(BODY.PEEK[HEADER])')
+    raw = b''.join(x[1] for x in h if isinstance(x, tuple))
+    import email as _email
+    msg = _email.message_from_bytes(raw)
+    lu_hdr = msg.get('List-Unsubscribe', '') or ''
+    post = msg.get('List-Unsubscribe-Post', '') or ''
+    lu = re.findall(r'<([^>]+)>', lu_hdr)
+    oc = 'One-Click' in post or 'One-Click' in lu_hdr
     https = [u for u in lu if u.startswith('http')]
     mailto = [u for u in lu if u.startswith('mailto')]
     if https and oc:
@@ -410,7 +427,8 @@ def cmd_unsub_list(M, top):
 
 
 def _is_protected(domain):
-    return any(p in domain for p in PROTECT_SENDERS)
+    d = domain.lower()
+    return any(p in d for p in PROTECT_SENDERS) or any(k in d for k in PROTECT_DOMAIN_KW)
 
 
 def cmd_sweep(provider, addr, pw, senders, days, yes):
