@@ -353,6 +353,7 @@ def main():
     p = argparse.ArgumentParser(prog="mail-declutter", description=__doc__.splitlines()[0])
     p.add_argument("--provider", choices=list(PROVIDERS), default="gmail")
     sub = p.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("serve", help="open the browser UI (easiest, no terminal after launch)")
     sub.add_parser("wizard", help="guided end-to-end cleanup (start here)")
     sub.add_parser("setup", help="store credentials for a provider")
     sub.add_parser("counts")
@@ -365,6 +366,8 @@ def main():
     a = p.parse_args()
     prov = a.provider
 
+    if a.cmd == "serve":
+        import webui; webui.serve(); return
     if a.cmd == "setup":
         run_setup(prov); return
     if a.cmd == "wizard":
