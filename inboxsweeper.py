@@ -191,7 +191,12 @@ def fetch_from(M, uids):
 
 
 def unsub_method(M, domain):
-    ids = search_sender(M, domain, days=1000)
+    if PROVIDERS[M._prov]["backend"] == "gmail":
+        # in:anywhere so we can still read the header even after mail was moved to Trash
+        t, d = M.uid('search', 'X-GM-RAW', '"from:%s in:anywhere"' % domain)
+        ids = d[0].split() if d and d[0] else []
+    else:
+        ids = search_sender(M, domain, days=1000)
     if not ids:
         return ('none', '')
     t, h = M.uid('fetch', ids[-1], '(BODY.PEEK[HEADER.FIELDS (List-Unsubscribe List-Unsubscribe-Post)])')
@@ -295,7 +300,8 @@ def track(action, provider="", ok=True, emails=0, size_bytes=0, unsubs=0):
                          "ok": bool(ok), "emails": emails,
                          "mb": round(size_bytes / 1048576.0, 1), "unsubs": unsubs}).encode()
         _u.urlopen(_u.Request(STATS_URL.rstrip("/") + "/event", data=body,
-                              headers={"Content-Type": "application/json"}), timeout=4)
+                              headers={"Content-Type": "application/json",
+                                       "User-Agent": "InboxSweeper/" + TOOL_VERSION}), timeout=4)
     except Exception:
         pass
 
@@ -489,9 +495,9 @@ def cmd_unsub_run(M, domains, addr, pw):
 
 
 def cmd_wizard(provider):
-    print("\n== mail-declutter (%s) ==" % provider)
+    print("\n== InboxSweeper (%s) ==" % provider)
     print("Safe by design: nothing is deleted permanently — mail is moved to Trash,")
-    print("which you can restore for ~30 days. Read RULESET.md for the full policy.\n")
+    print("which you can restore for ~30 days.\n")
     addr, pw = ensure_creds(provider, interactive=True)
     M = connect(provider, addr, pw, readonly=True)
     print("\nConnected as %s. Scanning...\n" % addr)
@@ -504,15 +510,17 @@ def cmd_wizard(provider):
     M.logout()
     if not junk:
         print("\nNothing obvious to clean. Done."); return
-    picked = input("\nMove OLD mail from ALL these senders to Trash? (recoverable) [y/N] ").strip().lower()
-    if picked == "y":
-        cmd_sweep(provider, addr, pw, ",".join(d for d, _ in junk), 365, yes=False)
-        if input("\nProceed for real? [y/N] ").strip().lower() == "y":
-            cmd_sweep(provider, addr, pw, ",".join(d for d, _ in junk), 365, yes=True)
-    if input("\nAlso UNSUBSCRIBE from these senders? [y/N] ").strip().lower() == "y":
+    doms = ",".join(d for d, _ in junk)
+    # Unsubscribe FIRST — while the mail is still in your mailbox (after it's in Trash we can't
+    # read the unsubscribe link).
+    if input("\nUNSUBSCRIBE from these senders? (best to do this first) [y/N] ").strip().lower() == "y":
         M = connect(provider, addr, pw, readonly=True)
-        cmd_unsub_run(M, ",".join(d for d, _ in junk), addr, pw)
+        cmd_unsub_run(M, doms, addr, pw)
         M.logout()
+    if input("\nMove OLD mail from these senders to Trash? (recoverable) [y/N] ").strip().lower() == "y":
+        cmd_sweep(provider, addr, pw, doms, 365, yes=False)
+        if input("\nProceed for real? [y/N] ").strip().lower() == "y":
+            cmd_sweep(provider, addr, pw, doms, 365, yes=True)
     print("\nTip: after checking Trash looks right, empty it in your webmail. Re-run quarterly.")
 
 
