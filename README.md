@@ -43,9 +43,11 @@ click the green **Code** button → **Download ZIP**. Unzip it (double-click the
 **"Add Python to PATH"** in the installer.
 
 **Step 3 — Open the app.** Inside the unzipped folder:
-- **macOS:** double-click **`InboxSweeper.command`**. The first time only, macOS may warn it's
-  from an "unidentified developer" — **right-click the file → Open → Open** to allow it.
-- **Windows:** double-click **`InboxSweeper.bat`**.
+- **macOS:** double-click **`InboxSweeper.command`**. Because it's unsigned, macOS blocks it the
+  first time ("Apple could not verify…"). Allow it once: **System Settings → Privacy & Security →**
+  scroll to **Security → "Open Anyway"** → confirm → double-click again → **Open**.
+  *(Terminal shortcut: `xattr -c InboxSweeper.command`, then double-click.)*
+- **Windows:** double-click **`InboxSweeper.bat`**. If SmartScreen warns, click **More info → Run anyway**.
 
 It sets itself up and opens a small app in your **web browser**. From there it's all clicking:
 pick Gmail or Yahoo, paste an app password once (it shows you exactly how to get one), press
