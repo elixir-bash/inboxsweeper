@@ -10,7 +10,7 @@ command; no coding and no AI agent required.
 - ✉️ **Unsubscribes** via the RFC-8058 one-click POST or `mailto` — the safe methods only.
 - 🔒 **Safe by default** — protects financial, security, government, and transactional senders
   out of the box (see [`RULESET.md`](RULESET.md)).
-- 🤖 **Drives from Claude Code or Codex** (see [Agent integration](#agent-integration)).
+- 🤖 **Drives from Claude Code or Codex** (see [Claude Code / Codex](#claude-code--codex)).
 
 > ⚠️ **Read [`RULESET.md`](RULESET.md) before you run a sweep.** The one rule that matters
 > most: **recognize a sender → unsubscribe; don't recognize it → report spam, never
@@ -25,13 +25,13 @@ Pick the one that fits you:
 
 | You are… | Path | In short |
 |---|---|---|
-| **Anyone** — no tech needed | **🖱️ The app** | Download the installer, double-click. → [The app](#️-the-app-for-everyone) |
-| **A coder** | **⌨️ The terminal** | `pip install`, then one command. → [Terminal](#-the-terminal-for-coders) |
-| **A Claude Code / Codex user** | **🤖 Your AI agent** | Install the skill and just ask. → [AI agent](#-claude-code--codex) |
+| **Anyone** — no tech needed | **🖱️ The app** | Download the installer, double-click. → [The app](#the-app-for-everyone) |
+| **A coder** | **⌨️ The terminal** | `pip install`, then one command. → [Terminal](#the-terminal-for-coders) |
+| **A Claude Code / Codex user** | **🤖 Your AI agent** | Install the skill and just ask. → [AI agent](#claude-code--codex) |
 
 ---
 
-## 🖱️ The app (for everyone)
+## The app (for everyone)
 
 Three one-time steps, then it's just double-click. No commands to memorize.
 
@@ -56,7 +56,7 @@ on your own computer — nothing is uploaded — and deletions go to Trash, so t
 > that's the real grandma-proof version. Until it lands, the three steps above are the way in.
 > (If you already use the terminal, `python3 inboxsweeper.py serve` opens the same app.)
 
-## ⌨️ The terminal (for coders)
+## The terminal (for coders)
 
 If you just want a clean inbox and don't care how it works:
 
@@ -133,10 +133,10 @@ python3 inboxsweeper.py counts
 python3 inboxsweeper.py profile --top 40
 
 # 3. Preview a deletion (DRY RUN — nothing moves)
-python3 inboxsweeper.py sweep --query "older_than:1y unsubscribe from:linkedin.com"
+python3 inboxsweeper.py sweep --senders linkedin.com
 
-# 4. Actually move them to Bin (30-day recovery)
-python3 inboxsweeper.py sweep --query "older_than:1y unsubscribe from:linkedin.com" --yes
+# 4. Actually move them to Trash (30-day recovery)
+python3 inboxsweeper.py sweep --senders linkedin.com --yes
 
 # 5. See each sender's unsubscribe method, then unsubscribe from specific ones
 python3 inboxsweeper.py unsub-list --top 40
@@ -181,7 +181,7 @@ skipped.
   - **mailto** → sends an unsubscribe email via SMTP using your app password.
   - **weblink-only** → reported for manual handling (never auto-clicked; could be a tracker).
 
-## 🤖 Claude Code / Codex
+## Claude Code / Codex
 
 This repo ships ready-made instructions so an AI coding agent can drive the tool for you.
 
