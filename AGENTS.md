@@ -1,9 +1,9 @@
-# AGENTS.md — driving gmail-declutter from an AI coding agent
+# AGENTS.md — driving inboxsweeper from an AI coding agent
 
 Instructions for Codex, Claude Code, or any tool-using agent to operate this repo safely.
 
 ## What this is
-A Python IMAP tool that cleans up and unsubscribes from a personal Gmail. `gmail_cleanup.py`
+A Python IMAP tool that cleans up and unsubscribes from a personal Gmail. `inboxsweeper.py`
 is the entrypoint. Read `RULESET.md` before deleting or unsubscribing anything.
 
 ## Credentials
@@ -28,12 +28,12 @@ Keychain or env vars. The value must never appear in the transcript.
 
 ## Recommended flow
 ```bash
-python3 gmail_cleanup.py counts                       # landscape
-python3 gmail_cleanup.py profile --top 40             # rank noisy senders
-python3 gmail_cleanup.py sweep --query "<Q>"          # DRY RUN, show count
-python3 gmail_cleanup.py sweep --query "<Q>" --yes    # after approval → Bin
-python3 gmail_cleanup.py unsub-list --top 40          # methods per sender
-python3 gmail_cleanup.py unsub-run --domains "a.com,b.com"
+python3 inboxsweeper.py counts                       # landscape
+python3 inboxsweeper.py profile --top 40             # rank noisy senders
+python3 inboxsweeper.py sweep --query "<Q>"          # DRY RUN, show count
+python3 inboxsweeper.py sweep --query "<Q>" --yes    # after approval → Bin
+python3 inboxsweeper.py unsub-list --top 40          # methods per sender
+python3 inboxsweeper.py unsub-run --domains "a.com,b.com"
 ```
 
 ## Presenting results

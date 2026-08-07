@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-"""Local browser UI for mail-declutter. Launched via `gmail_cleanup.py serve`.
+"""Local browser UI for mail-declutter. Launched via `inboxsweeper.py serve`.
 
 Binds to 127.0.0.1 only, guarded by a random per-run token in the URL. Reuses the
-engine in gmail_cleanup.py — no duplicated cleanup logic.
+engine in inboxsweeper.py — no duplicated cleanup logic.
 """
 import json, os, re, secrets, smtplib, threading, webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from email.mime.text import MIMEText
 from urllib.parse import unquote
 
-import gmail_cleanup as E   # the engine (same folder)
+import inboxsweeper as E   # the engine (same folder)
 
 TOKEN = secrets.token_urlsafe(16)
 
 PAGE = """<!doctype html><html><head><meta charset=utf-8>
-<title>Mail Declutter</title><meta name=viewport content="width=device-width,initial-scale=1">
+<title>InboxSweeper</title><meta name=viewport content="width=device-width,initial-scale=1">
 <style>
 :root{color-scheme:light dark}
 body{font:15px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;max-width:820px;margin:0 auto;padding:24px;
@@ -32,7 +32,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;
 .hint{color:#8a94a6;font-size:13px} a{color:#60a5fa}
 .hide{display:none}
 </style></head><body>
-<h1>Mail Declutter</h1>
+<h1>InboxSweeper</h1>
 <p class=sub>Clean up and unsubscribe from promotional email. Deletions go to Trash (recoverable).</p>
 
 <div class=card id=connect>
@@ -198,7 +198,7 @@ def serve(port=8765):
     else:
         raise SystemExit("no free port")
     url = "http://127.0.0.1:%d/?t=%s" % (p, TOKEN)
-    print("Mail Declutter UI running at:\n  %s\n(Press Ctrl+C to stop.)" % url)
+    print("InboxSweeper UI running at:\n  %s\n(Press Ctrl+C to stop.)" % url)
     threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:
         httpd.serve_forever()

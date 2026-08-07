@@ -8,7 +8,7 @@ annoyances, given away free, kept radically private. Mail cleanup is the flagshi
   (Working directions: Kindware / GoodBits / Everyday / Nuggets.) Decide this first — every
   new nugget markets the last.
 - **Nuggets** = individual tools under the umbrella. #1 = the mail cleaner (working title
-  **MailBroom**). Future: duplicate-file finder, subscription tracker, photo declutter, etc.
+  **InboxSweeper**). Future: duplicate-file finder, subscription tracker, photo declutter, etc.
 
 ## 2. The nugget template (leverage)
 Every nugget ships from one template so a new tool takes days, not weeks, and they all feel
@@ -49,7 +49,7 @@ Resolve with precision + transparency:
   Issue via bot token. Everything lands in git; triage/reply via `gh`.
 
 ## 7. Rollout
-1. Extract the shared kit (design system + shell + worker + templates) from MailBroom.
-2. Ship MailBroom v1 with consent + live counter.
+1. Extract the shared kit (design system + shell + worker + templates) from InboxSweeper.
+2. Ship InboxSweeper v1 with consent + live counter.
 3. Stand up the hub site.
 4. Template nugget #2 to prove the pipeline is days-fast.
