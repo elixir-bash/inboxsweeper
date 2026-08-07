@@ -137,7 +137,10 @@ def search_bulk(M, days=365):
 
 def search_sender(M, domain, days=365):
     if PROVIDERS[M._prov]["backend"] == "gmail":
-        t, d = M.uid('search', 'X-GM-RAW', '"from:%s older_than:%dd"' % (domain, days))
+        q = "from:%s" % domain if days <= 0 else "from:%s older_than:%dd" % (domain, days)
+        t, d = M.uid('search', 'X-GM-RAW', '"%s"' % q)
+    elif days <= 0:
+        t, d = M.uid('search', None, 'FROM', domain)
     else:
         t, d = M.uid('search', None, 'FROM', domain, 'BEFORE', _imap_date(days))
     return d[0].split() if d and d[0] else []
@@ -188,6 +191,45 @@ def move_to_trash(M, uids, batch=300):
         moved += len(chunk)
         time.sleep(1.2)
     return moved
+
+
+def total_size(M, uids):
+    """Sum of RFC822.SIZE for a set of UIDs (bytes) — powers the 'storage freed' stat."""
+    tot = 0
+    for i in range(0, len(uids), 1000):
+        t, d = M.uid('fetch', b','.join(uids[i:i + 1000]), '(RFC822.SIZE)')
+        for it in d:
+            raw = it if isinstance(it, (bytes, bytearray)) else (it[0] if isinstance(it, tuple) else b'')
+            m = re.search(rb'RFC822\.SIZE (\d+)', raw)
+            if m:
+                tot += int(m.group(1))
+    return tot
+
+
+def human(n):
+    for u in ("B", "KB", "MB", "GB"):
+        if n < 1024 or u == "GB":
+            return "%.1f %s" % (n, u)
+        n /= 1024.0
+
+
+# ------------------------------------------------------------- blocklist -------
+def _blocklist_path(provider):
+    d = os.path.expanduser("~/.config/mail-declutter"); os.makedirs(d, exist_ok=True)
+    return os.path.join(d, "%s.blocklist" % provider)
+
+
+def load_blocklist(provider):
+    p = _blocklist_path(provider)
+    return [l.strip() for l in open(p) if l.strip()] if os.path.exists(p) else []
+
+
+def add_blocklist(provider, domains):
+    cur = set(load_blocklist(provider))
+    cur.update(d.strip() for d in domains if d.strip())
+    with open(_blocklist_path(provider), "w") as f:
+        f.write("\n".join(sorted(cur)) + "\n")
+    return sorted(cur)
 
 
 # ---------------------------------------------------------- creds bootstrap ----
@@ -262,27 +304,45 @@ def cmd_sweep(provider, addr, pw, senders, days, yes):
     M = connect(provider, addr, pw, readonly=True)
     targets = [s.strip() for s in senders.split(",") if s.strip()] if senders else \
         [d for d, _ in fetch_from(M, search_bulk(M, days)).most_common() if not _is_protected(d)]
-    total = 0
+    total = 0; tot_sz = 0
     plan = []
     for dom in targets:
         if _is_protected(dom):
             print("skip (protected): %s" % dom); continue
-        n = len(search_sender(M, dom, days))
-        plan.append((dom, n)); total += n
+        uids = search_sender(M, dom, days)
+        plan.append((dom, len(uids))); total += len(uids); tot_sz += total_size(M, uids)
     for dom, n in plan:
         print("  %-34s %d msgs" % (dom, n))
-    print("TOTAL to move to %s: %d messages from %d senders" % (M._trash, total, len(plan)))
+    print("TOTAL to move to %s: %d messages (~%s) from %d senders" % (M._trash, total, human(tot_sz), len(plan)))
     if not yes:
-        print("\nDRY RUN. Re-run with --yes to move them to Trash (recoverable)."); M.logout(); return
+        print("\nDRY RUN. Re-run with --yes to move them to Trash (recoverable)."); M.logout(); return (0, 0)
     M.logout()
     M = connect(provider, addr, pw, readonly=False)
-    moved = 0
+    moved = 0; freed = 0
     for dom, _ in plan:
         uids = search_sender(M, dom, days)
+        freed += total_size(M, uids)
         moved += move_to_trash(M, uids)
         print("  moved %s (%d)" % (dom, len(uids)))
-    print("DONE. Moved %d messages to %s (30-day recovery)." % (moved, M._trash))
+    print("DONE. Moved %d messages to %s — freed ~%s (30-day recovery)." % (moved, M._trash, human(freed)))
     M.logout()
+    return (moved, freed)
+
+
+def cmd_block(provider, addr, pw, senders, yes):
+    doms = [s.strip() for s in senders.split(",") if s.strip()]
+    add_blocklist(provider, doms)
+    print("Blocked %d sender(s): %s" % (len(doms), ", ".join(doms)))
+    print("Deleting their existing mail (all dates); future mail is auto-cleaned via `autoclean`.\n")
+    cmd_sweep(provider, addr, pw, ",".join(doms), 0, yes)  # days<=0 → all-time
+
+
+def cmd_autoclean(provider, addr, pw, yes):
+    bl = load_blocklist(provider)
+    if not bl:
+        print("No blocked senders yet. Use:  block --senders a.com,b.com"); return
+    print("Auto-cleaning %d blocked sender(s): %s" % (len(bl), ", ".join(bl)))
+    cmd_sweep(provider, addr, pw, ",".join(bl), 0, yes)
 
 
 def cmd_unsub_run(M, domains, addr, pw):
@@ -363,6 +423,10 @@ def main():
     x.add_argument("--senders", help="comma-separated domains; omit to target all non-protected bulk senders")
     x.add_argument("--days", type=int, default=365); x.add_argument("--yes", action="store_true")
     x = sub.add_parser("unsub-run"); x.add_argument("--domains", required=True)
+    x = sub.add_parser("block", help="delete a sender's mail + block them so future mail is auto-cleaned")
+    x.add_argument("--senders", required=True); x.add_argument("--yes", action="store_true")
+    x = sub.add_parser("autoclean", help="re-clean every blocked sender (great for a cron job)")
+    x.add_argument("--yes", action="store_true")
     a = p.parse_args()
     prov = a.provider
 
@@ -375,6 +439,12 @@ def main():
     if a.cmd == "sweep":
         addr, pw = ensure_creds(prov, interactive=False)
         cmd_sweep(prov, addr, pw, a.senders, a.days, a.yes); return
+    if a.cmd == "block":
+        addr, pw = ensure_creds(prov, interactive=False)
+        cmd_block(prov, addr, pw, a.senders, a.yes); return
+    if a.cmd == "autoclean":
+        addr, pw = ensure_creds(prov, interactive=False)
+        cmd_autoclean(prov, addr, pw, a.yes); return
 
     addr, pw = ensure_creds(prov, interactive=False)
     M = connect(prov, addr, pw, readonly=True)
