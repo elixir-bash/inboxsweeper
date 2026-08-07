@@ -198,12 +198,27 @@ def serve(port=8765):
     else:
         raise SystemExit("no free port")
     url = "http://127.0.0.1:%d/?t=%s" % (p, TOKEN)
-    print("InboxSweeper UI running at:\n  %s\n(Press Ctrl+C to stop.)" % url)
-    threading.Timer(0.6, lambda: webbrowser.open(url)).start()
+    _say("InboxSweeper UI running at:\n  %s\n(Press Ctrl+C to stop.)" % url)
+    threading.Timer(0.6, lambda: _safe_open(url)).start()
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\nstopped.")
+        _say("\nstopped.")
+
+
+def _say(msg):
+    # Bundled --windowed apps have no stdout; a bare print() would crash them.
+    try:
+        print(msg)
+    except Exception:
+        pass
+
+
+def _safe_open(url):
+    try:
+        webbrowser.open(url)
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":

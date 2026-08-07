@@ -15,3 +15,8 @@ venv/
 .DS_Store
 .idea/
 .vscode/
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
