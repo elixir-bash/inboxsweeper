@@ -1,16 +1,17 @@
-# inboxsweeper
+# InboxSweeper
 
-Safe inbox cleanup **and** unsubscribe for **Gmail and Yahoo** over IMAP — no API project, no
-OAuth consent screen, no browser extension. Just an app password. Run it with one guided
-command; no coding and no AI agent required.
+**Clean years of junk out of your inbox — for free, without handing your email to anyone.**
 
-- 🗑️ **Deletes to Bin, never permanently** (30-day recovery). Reversible by design.
-- 🎯 **Cleans by sender, not by category** — because Gmail's "Updates" tab is full of
-  *transactional* mail (receipts, orders, bookings) you don't want to lose.
-- ✉️ **Unsubscribes** via the RFC-8058 one-click POST or `mailto` — the safe methods only.
-- 🔒 **Safe by default** — protects financial, security, government, and transactional senders
-  out of the box (see [`RULESET.md`](RULESET.md)).
-- 🤖 **Drives from Claude Code or Codex** (see [Claude Code / Codex](#claude-code--codex)).
+InboxSweeper deletes old promotions and newsletters in bulk and unsubscribes you from the noise
+— across **Gmail, Yahoo, and other email accounts**. It runs entirely on **your own computer**;
+your email is never uploaded anywhere. Deleted mail goes to Trash, so you can always get it back.
+
+- 🆓 **Free and open source** — no account, no subscription, no catch.
+- 🔒 **Private** — everything happens on your machine; nothing is sent to a company.
+- 🧹 **Cleans by who sent it** — clears the junk without touching your receipts, orders, or bookings.
+- ✉️ **Actually unsubscribes** — it uses the real one-click unsubscribe, not just delete-and-hope.
+- ♻️ **Safe** — deletions go to Trash (recoverable), and bank, security, and government email is protected automatically.
+- 🖱️ **Three ways to use it** — a click-through app, the terminal, or your AI assistant (Claude / Codex).
 
 > ⚠️ **Read [`RULESET.md`](RULESET.md) before you run a sweep.** The one rule that matters
 > most: **recognize a sender → unsubscribe; don't recognize it → report spam, never
