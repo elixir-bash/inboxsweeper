@@ -249,13 +249,18 @@ def _anon_uid():
     return u
 
 
-def track(action, provider, emails=0, size_bytes=0, unsubs=0):
+TOOL_VERSION = "0.3"
+
+
+def track(action, provider="", ok=True, emails=0, size_bytes=0, unsubs=0):
+    """Anonymous usage + performance event. Counts/metadata only — never PII."""
     if not STATS_URL or os.environ.get("INBOXSWEEPER_NO_TELEMETRY"):
         return
     try:
-        import json as _j, urllib.request as _u
-        body = _j.dumps({"uid": _anon_uid(), "tool": "inboxsweeper", "action": action,
-                         "provider": provider, "emails": emails,
+        import json as _j, urllib.request as _u, platform
+        body = _j.dumps({"uid": _anon_uid(), "tool": "inboxsweeper", "v": TOOL_VERSION,
+                         "os": platform.system(), "action": action, "provider": provider,
+                         "ok": bool(ok), "emails": emails,
                          "mb": round(size_bytes / 1048576.0, 1), "unsubs": unsubs}).encode()
         _u.urlopen(_u.Request(STATS_URL.rstrip("/") + "/event", data=body,
                               headers={"Content-Type": "application/json"}), timeout=4)
@@ -503,6 +508,7 @@ def main():
     sub.add_parser("remind-run", help=argparse.SUPPRESS)
     a = p.parse_args()
     prov = a.provider
+    track("cmd_" + a.cmd, provider=prov)  # anonymous usage/perf ping (off unless configured)
 
     if a.cmd == "remind":
         cmd_remind(a.off); return
