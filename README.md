@@ -13,6 +13,8 @@ your email is never uploaded anywhere. Deleted mail goes to Trash, so you can al
 - ♻️ **Safe** — deletions go to Trash (recoverable), and bank, security, and government email is protected automatically.
 - 🖱️ **Three ways to use it** — a click-through app, the terminal, or your AI assistant (Claude / Codex).
 
+**⬇️ Get the app:** [Download for macOS](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper-macos.zip) · [Download for Windows](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe) — or scroll to [the terminal](#the-terminal-for-coders) / [Claude & Codex](#claude-code--codex) options.
+
 > ⚠️ **Read the built-in safety rules before you run a sweep.** The one rule that matters
 > most: **recognize a sender → unsubscribe; don't recognize it → report spam, never
 > unsubscribe.** Clicking unsubscribe on real spam confirms your address is live and gets
@@ -34,30 +36,38 @@ Pick the one that fits you:
 
 ## The app (for everyone)
 
-Three one-time steps, then it's just double-click. No commands to memorize.
+Download the ready-to-run app for your computer — **no Python, no terminal, nothing else to install.**
 
-**Step 1 — Get the files.** On the [GitHub page](https://github.com/elixir-bash/inboxsweeper),
-click the green **Code** button → **Download ZIP**. Unzip it (double-click the download).
+### 🍎 macOS
 
-**Step 2 — Install Python** *(skip if you already have it).* It's a free one-time install from
-[python.org/downloads](https://www.python.org/downloads/). On **Windows**, tick
-**"Add Python to PATH"** in the installer.
+1. Download **[InboxSweeper-macos.zip](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper-macos.zip)**.
+2. Double-click the downloaded `.zip` to unzip it → you get **`InboxSweeper.app`** (drag it to Applications if you like).
+3. **First launch only:** the app is free and unsigned, so macOS blocks it once. To allow it:
+   open  **→ System Settings → Privacy & Security**, scroll down to **Security**, and click
+   **"Open Anyway"** next to *InboxSweeper* → confirm with your password / Touch ID.
+   *(Right-click → Open no longer works on modern macOS — use Settings. Terminal shortcut:
+   `xattr -dr com.apple.quarantine ~/Downloads/InboxSweeper.app`)*
+4. It opens in your **web browser** — pick Gmail or Yahoo and follow the on-screen steps.
 
-**Step 3 — Open the app.** Inside the unzipped folder:
-- **macOS:** double-click **`InboxSweeper.command`**. Because it's unsigned, macOS blocks it the
-  first time ("Apple could not verify…"). Allow it once: **System Settings → Privacy & Security →**
-  scroll to **Security → "Open Anyway"** → confirm → double-click again → **Open**.
-  *(Terminal shortcut: `xattr -c InboxSweeper.command`, then double-click.)*
-- **Windows:** double-click **`InboxSweeper.bat`**. If SmartScreen warns, click **More info → Run anyway**.
+### 🪟 Windows
 
-It sets itself up and opens a small app in your **web browser**. From there it's all clicking:
-pick Gmail or Yahoo, paste an app password once (it shows you exactly how to get one), press
-**Scan**, tick the junk senders, and hit **Move to Trash** or **Unsubscribe**. Everything runs
-on your own computer — nothing is uploaded — and deletions go to Trash, so they're recoverable.
+1. Download **[InboxSweeper.exe](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe)**.
+2. Double-click it. Windows SmartScreen may warn (free/unsigned) → click **More info → Run anyway**.
+3. It opens in your **web browser** — pick Gmail or Yahoo and follow the on-screen steps.
 
-> **Want truly zero setup (no ZIP, no Python)?** A signed one-click installer is on the roadmap —
-> that's the real grandma-proof version. Until it lands, the three steps above are the way in.
-> (If you already use the terminal, `python3 inboxsweeper.py serve` opens the same app.)
+### 🐧 Linux / other
+
+No prebuilt app yet — use **[the terminal](#the-terminal-for-coders)** instead (it's two commands).
+
+---
+
+Once it's open, it's all clicking: paste an app password once (it shows you exactly how to get
+one), press **Scan**, tick the junk senders, and hit **Move to Trash** or **Unsubscribe**.
+Everything runs on your own computer — nothing is uploaded — and deletions go to Trash, so
+they're recoverable.
+
+> A **signed** installer (no security warning at all) is on the roadmap. Until then, the one-time
+> "Open Anyway" / "Run anyway" step above is all it takes.
 
 ## The terminal (for coders)
 
