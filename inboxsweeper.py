@@ -124,26 +124,57 @@ def _imap_date(days):
     return d.strftime("%d-%b-%Y")
 
 
+def _imap_search(M, criteria):
+    """IMAP SEARCH that falls back to ALL when the server rejects the criteria (e.g. Yahoo)."""
+    try:
+        t, d = M.uid('search', None, *criteria)
+        if t == 'OK':
+            return d[0].split() if d and d[0] else []
+    except imaplib.IMAP4.error:
+        pass
+    t, d = M.uid('search', None, 'ALL')
+    return d[0].split() if d and d[0] else []
+
+
+def _has_unsub(M, uids):
+    """Keep only UIDs whose message carries a List-Unsubscribe header (client-side, works anywhere)."""
+    keep = []
+    for i in range(0, len(uids), 400):
+        t, d = M.uid('fetch', b','.join(uids[i:i + 400]),
+                     '(UID BODY.PEEK[HEADER.FIELDS (List-Unsubscribe)])')
+        for it in d or []:
+            if isinstance(it, tuple):
+                m = re.search(rb'UID (\d+)', it[0])
+                if m and b'unsubscribe' in it[1].lower():
+                    keep.append(m.group(1))
+    return keep
+
+
 def search_bulk(M, days=365):
     """UIDs of old messages that carry an unsubscribe header (the bulk-mail signal)."""
     if PROVIDERS[M._prov]["backend"] == "gmail":
         q = ("older_than:%dd unsubscribe -is:starred -{%s} %s"
              % (days, " ".join(PROTECT_KW), " ".join("-from:%s" % d for d in PROTECT_SENDERS)))
         t, d = M.uid('search', 'X-GM-RAW', '"%s"' % q)
-    else:  # standard IMAP
-        t, d = M.uid('search', None, 'BEFORE', _imap_date(days), 'HEADER', 'List-Unsubscribe', '""')
-    return d[0].split() if d and d[0] else []
+        return d[0].split() if d and d[0] else []
+    # Standard IMAP (Yahoo, etc.): HEADER searches are often unsupported — filter client-side.
+    return _has_unsub(M, _imap_search(M, ['BEFORE', _imap_date(days)]))
 
 
 def search_sender(M, domain, days=365):
     if PROVIDERS[M._prov]["backend"] == "gmail":
         q = "from:%s" % domain if days <= 0 else "from:%s older_than:%dd" % (domain, days)
         t, d = M.uid('search', 'X-GM-RAW', '"%s"' % q)
-    elif days <= 0:
-        t, d = M.uid('search', None, 'FROM', domain)
-    else:
-        t, d = M.uid('search', None, 'FROM', domain, 'BEFORE', _imap_date(days))
-    return d[0].split() if d and d[0] else []
+        return d[0].split() if d and d[0] else []
+    tries = ([['FROM', domain, 'BEFORE', _imap_date(days)]] if days > 0 else []) + [['FROM', domain]]
+    for crit in tries:
+        try:
+            t, d = M.uid('search', None, *crit)
+            if t == 'OK':
+                return d[0].split() if d and d[0] else []
+        except imaplib.IMAP4.error:
+            continue
+    return []
 
 
 def fetch_from(M, uids):
