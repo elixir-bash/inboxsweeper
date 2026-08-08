@@ -213,9 +213,13 @@ async function sendFeedback(){
   if(!WORKER_URL)return;
   try{
     const s=await (await fetch(WORKER_URL.replace(/\/$/,'')+"/stats")).json();
-    if((s.users||0)>0) document.getElementById('impact-line').innerHTML=
-      "<b>"+s.emails.toLocaleString()+"</b> emails swept · <b>"+s.gb+" GB</b> freed · <b>"+
-      s.unsubs.toLocaleString()+"</b> unsubscribes — for <b>"+s.users.toLocaleString()+"</b> people.";
+    if((s.emails||0)>0){
+      const size = s.gb>=1 ? (s.gb+" GB") : ((s.mb||0)+" MB");
+      document.getElementById('impact-line').innerHTML=
+        "<b>"+s.emails.toLocaleString()+"</b> emails swept · <b>"+size+"</b> freed · <b>"+
+        (s.unsubs||0).toLocaleString()+"</b> unsubscribes"+
+        ((s.users||0)>=10 ? (" — for <b>"+s.users.toLocaleString()+"</b> people") : "")+".";
+    }
   }catch(e){}
 })();
 </script>
