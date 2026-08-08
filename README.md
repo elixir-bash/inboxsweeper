@@ -12,9 +12,9 @@ anywhere. Deleted mail goes to Trash, so you can always get it back.
 - 🧹 **Cleans by who sent it** — clears the junk without touching your receipts, orders, or bookings.
 - ✉️ **Actually unsubscribes** — it uses the real one-click unsubscribe, not just delete-and-hope.
 - ♻️ **Safe** — deletions go to Trash (recoverable), and bank, security, and government email is protected automatically.
-- 🖱️ **Three ways to use it** — a click-through app, the terminal, or your AI assistant (Claude / Codex).
+- 🖱️ **Four ways to use it** — a double-click web app, a one-file Windows `.exe`, the terminal, or your AI assistant (Claude / Codex).
 
-**⬇️ Get the app:** [Download for macOS](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper-macos.zip) · [Download for Windows](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe) — or scroll to [the terminal](#the-terminal-for-coders) / [Claude & Codex](#claude-code--codex) options.
+**⬇️ Get it:** [Download the app (ZIP)](https://github.com/elixir-bash/inboxsweeper/archive/refs/heads/main.zip) then double-click the launcher inside · or the one-file [Windows .exe](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe) — or scroll to [the terminal](#the-terminal-for-coders) / [Claude & Codex](#claude-code--codex) options.
 
 > ⚠️ **Read the built-in safety rules before you run a sweep.** The one rule that matters
 > most: **recognize a sender → unsubscribe; don't recognize it → report spam, never
@@ -47,52 +47,47 @@ next batch.
 
 ---
 
-## Three ways to use it
+## Four ways to use it
 
 Pick the one that fits you:
 
 | You are… | Path | In short |
 |---|---|---|
-| **Anyone** — no tech needed | **🖱️ The app** | Download the installer, double-click. → [The app](#the-app-for-everyone) |
-| **A coder** | **⌨️ The terminal** | `pip install`, then one command. → [Terminal](#the-terminal-for-coders) |
-| **A Claude Code / Codex user** | **🤖 Your AI agent** | Install the skill and just ask. → [AI agent](#claude-code--codex) |
+| **Anyone** — no tech needed *(recommended)* | **🖱️ Web app** | Download the ZIP, double-click the launcher. Opens in your browser. → [Web app](#-the-web-app-for-everyone) |
+| **On Windows, want zero setup** | **📦 One-file .exe** | Download `InboxSweeper.exe`, double-click. → [Windows .exe](#-windows-exe-nothing-else-to-install) |
+| **A coder** | **⌨️ Terminal** | `pip install`, then one command. → [Terminal](#the-terminal-for-coders) |
+| **A Claude Code / Codex user** | **🤖 Claude skill** | Install the skill and just ask. → [AI agent](#claude-code--codex) |
 
 ---
 
-## The app (for everyone)
+## 🖱️ The web app (for everyone)
 
-Download the ready-to-run app for your computer — **no Python, no terminal, nothing else to install.**
+Works on **Mac, Windows, and Linux**, always runs the latest version — nothing to compile.
 
-### 🍎 macOS
+1. **Download the app:** on the [GitHub page](https://github.com/elixir-bash/inboxsweeper), click the
+   green **Code** button → **Download ZIP** *(or use this [direct link](https://github.com/elixir-bash/inboxsweeper/archive/refs/heads/main.zip))*.
+2. **Unzip it** — double-click on Mac; right-click → *Extract All* on Windows.
+3. Open the unzipped folder and **double-click the launcher for your computer:**
+   - **🍎 macOS →** `InboxSweeper.command`
+     *(first time only: right-click it → **Open** → **Open** to clear the one free-software warning.)*
+   - **🪟 Windows →** `InboxSweeper.bat`
+   - **🐧 Linux →** `InboxSweeper.command` (or run `python3 inboxsweeper.py serve`)
+4. A small window opens and **InboxSweeper appears in your web browser.** Keep that window open while you use it.
 
-1. Download **[InboxSweeper-macos.zip](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper-macos.zip)**.
-2. Double-click the downloaded `.zip` to unzip it → you get **`InboxSweeper.app`** (drag it to Applications if you like).
-3. **First launch only:** the app is free and unsigned, so macOS blocks it once. To allow it:
-   open  **→ System Settings → Privacy & Security**, scroll down to **Security**, and click
-   **"Open Anyway"** next to *InboxSweeper* → confirm with your password / Touch ID.
-   *(Right-click → Open no longer works on modern macOS — use Settings. Terminal shortcut:
-   `xattr -dr com.apple.quarantine ~/Downloads/InboxSweeper.app`)*
-4. It opens in your **web browser** — pick Gmail or Yahoo and follow the on-screen steps.
+It installs its one dependency automatically. **Don't have Python?** The launcher opens the download
+page and walks you through the free, one-time install — then just double-click again. From there it's
+all clicking: paste an app password once (it shows you exactly how to get one), **Scan**, tick the junk
+senders, and hit **Move to Trash** or **Unsubscribe**. Nothing is uploaded; deletions go to Trash.
 
-### 🪟 Windows
+## 📦 Windows .exe (nothing else to install)
+
+Prefer a true one-file download with **no Python step at all**? On Windows:
 
 1. Download **[InboxSweeper.exe](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe)**.
 2. Double-click it. Windows SmartScreen may warn (free/unsigned) → click **More info → Run anyway**.
 3. It opens in your **web browser** — pick Gmail or Yahoo and follow the on-screen steps.
 
-### 🐧 Linux / other
-
-No prebuilt app yet — use **[the terminal](#the-terminal-for-coders)** instead (it's two commands).
-
 ---
-
-Once it's open, it's all clicking: paste an app password once (it shows you exactly how to get
-one), press **Scan**, tick the junk senders, and hit **Move to Trash** or **Unsubscribe**.
-Everything runs on your own computer — nothing is uploaded — and deletions go to Trash, so
-they're recoverable.
-
-> A **signed** installer (no security warning at all) is on the roadmap. Until then, the one-time
-> "Open Anyway" / "Run anyway" step above is all it takes.
 
 ## The terminal (for coders)
 
@@ -212,6 +207,22 @@ skipped.
 5. `unsub-list` → `unsub-run` the recognized DELETE senders.
 6. Unrecognized/spammy senders: **report spam in Gmail — don't unsubscribe.**
 7. Add Gmail **filters** for the worst repeat offenders so the backlog can't rebuild.
+
+## The story behind it
+
+For years I cleaned my inbox by hand — thousands of promotions and newsletters, one tedious pass at
+a time. Eventually I started writing small scripts to take some of the load off, and over several
+years those grew into a messy but working pile of code I'd run whenever the clutter got unbearable.
+It did the job, barely, and only I could run it.
+
+This year, working with AI, I finally built the thing I'd always pictured — not a heap of scripts,
+but a real app: the cleaning modes, the safe-by-default sweeps, the one-click unsubscribe, the
+browser UI, the whole construct exactly as I'd envisioned it. And then the step I'd never gotten
+around to on my own — making it **open source**, so anyone can clean their inbox the same way, for
+free, without handing their mail to a company.
+
+That's what InboxSweeper is: years of doing this the hard way, finally turned into something anyone
+can use.
 
 ## How it works
 

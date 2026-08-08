@@ -10,13 +10,10 @@ permissions:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-latest
-          - os: windows-latest
-    runs-on: ${{ matrix.os }}
+    # Only the Windows one-file .exe is shipped as a prebuilt binary now.
+    # Mac/Linux use the double-click launcher (InboxSweeper.command) over the
+    # source ZIP, so there's nothing to build for them.
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,15 +21,7 @@ jobs:
           python-version: '3.11'
       - run: pip install pyinstaller requests
 
-      - name: Build (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          pyinstaller --noconfirm --windowed --name InboxSweeper \
-            --collect-submodules requests --hidden-import webui --hidden-import inboxsweeper app.py
-          cd dist && zip -r InboxSweeper-macos.zip InboxSweeper.app
-
       - name: Build (Windows)
-        if: runner.os == 'Windows'
         run: >
           pyinstaller --noconfirm --onefile --name InboxSweeper
           --collect-submodules requests --hidden-import webui --hidden-import inboxsweeper app.py
@@ -42,5 +31,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/InboxSweeper-macos.zip
             dist/InboxSweeper.exe

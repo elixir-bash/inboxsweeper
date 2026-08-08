@@ -74,12 +74,12 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
    from the noise in your Gmail (Yahoo &amp; other IMAP: experimental) — running 100% on your own
    machine. <b>Your email never leaves it.</b> Free and open source.</p>
   <div class="cta">
-    <a class="btn" href="https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper-macos.zip">⬇ macOS</a>
-    <a class="btn" href="https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe">⬇ Windows</a>
+    <a class="btn" href="https://github.com/elixir-bash/inboxsweeper/archive/refs/heads/main.zip">⬇ Download the app</a>
+    <a class="btn ghost" href="https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe">⬇ Windows .exe</a>
     <a class="btn ghost" href="#start">Other ways</a>
     <a class="btn ghost" href="https://github.com/elixir-bash/inboxsweeper">GitHub</a>
   </div>
-  <p class="muted" style="font-size:13px;margin-top:10px">Free · unsigned, so first launch: <b>macOS</b> → System Settings → Privacy &amp; Security → "Open Anyway" · <b>Windows</b> → "More info → Run anyway".</p>
+  <p class="muted" style="font-size:13px;margin-top:10px">Free &amp; open. Unzip → double-click <span class="mono">InboxSweeper.command</span> (Mac) or <span class="mono">InboxSweeper.bat</span> (Windows). Opens in your browser. <b>Windows without Python?</b> Grab the one-file <span class="mono">.exe</span>.</p>
 </header>
 
 <div class="pillars">
@@ -176,23 +176,37 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
 </section>
 
 <section id="start">
-  <h2>Get started</h2>
-  <p class="muted">You need Python 3.9+ and a free app password for your mail account.</p>
-  <div class="install">
+  <h2>Get started — four ways</h2>
+  <p class="muted">Pick whichever fits you. All four run 100% on your own machine.</p>
+
+  <div class="grid" style="margin-top:22px">
+    <div class="feat"><h4>🖱️ Web app <span class="muted" style="font-size:12px">· recommended</span></h4>
+      <p>Download the app (green <b>Code → Download ZIP</b> on GitHub), unzip, and double-click
+      <span class="mono">InboxSweeper.command</span> (Mac) or <span class="mono">InboxSweeper.bat</span>
+      (Windows). It opens in your browser. No Python? The launcher walks you through the free one-time install.</p></div>
+    <div class="feat"><h4>📦 Windows .exe</h4>
+      <p>Want zero setup on Windows? Download the one-file <span class="mono">InboxSweeper.exe</span>,
+      double-click, done — nothing else to install. (SmartScreen → <em>More info → Run anyway</em>.)</p></div>
+    <div class="feat"><h4>⌨️ Terminal</h4>
+      <p>For coders — two lines and you're cleaning.</p></div>
+    <div class="feat"><h4>🤖 Claude / Codex skill</h4>
+      <p>Drive it from your AI assistant: install the bundled skill and just ask it to tidy your inbox.</p></div>
+  </div>
+
+  <div class="install" style="margin-top:20px">
     <code>git clone https://github.com/elixir-bash/inboxsweeper
 cd inboxsweeper
 pip install -r requirements.txt
 
-# open the app in your browser:
-python3 inboxsweeper.py serve
-# ...or the guided terminal version:
-python3 inboxsweeper.py wizard --provider yahoo</code>
+python3 inboxsweeper.py serve      # web app in your browser
+python3 inboxsweeper.py wizard     # or the guided terminal version</code>
   </div>
-  <p class="muted" style="margin-top:14px">On macOS you can also just double-click <span class="mono">InboxSweeper.command</span> (or <span class="mono">InboxSweeper.bat</span> on Windows).</p>
+  <p class="muted" style="margin-top:12px;font-size:13px">Needs Python 3.9+ and a free app password (the tool shows you exactly how to make one).</p>
+
   <h3 style="margin-top:28px">On the roadmap</h3>
   <ul class="roadmap">
     <li>Archive / mark-as-read as alternatives to Trash</li>
-    <li>Signed one-click <span class="mono">.app</span> / <span class="mono">.exe</span> installers (no Python needed)</li>
+    <li>A signed one-click <span class="mono">.exe</span> (no security warning at all)</li>
     <li>More free everyday tools under the same roof</li>
   </ul>
 </section>
