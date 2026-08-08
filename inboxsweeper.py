@@ -498,6 +498,7 @@ def cmd_unsub_run(M, domains, addr, pw):
     except ImportError:
         sys.exit("unsub-run needs 'requests' (pip install requests).")
     smtp = None
+    ok = 0
     for dom in [x.strip() for x in domains.split(",") if x.strip()]:
         meth, tgt = unsub_method(M, dom)
         try:
@@ -506,6 +507,8 @@ def cmd_unsub_run(M, domains, addr, pw):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'User-Agent': 'Mozilla/5.0'}, timeout=20)
                 print("%-30s 1click  HTTP %s" % (dom, r.status_code))
+                if 200 <= r.status_code < 300:
+                    ok += 1
             elif meth == 'mailto':
                 m = re.match(r'mailto:([^?]+)(\?(.*))?', tgt); to = m.group(1); subj = ''
                 for kv in (m.group(3) or '').split('&'):
@@ -517,6 +520,7 @@ def cmd_unsub_run(M, domains, addr, pw):
                 msg = MIMEText(''); msg['From'] = addr; msg['To'] = to; msg['Subject'] = subj or 'unsubscribe'
                 smtp.sendmail(addr, [to], msg.as_string())
                 print("%-30s mailto  sent→%s" % (dom, to[:30]))
+                ok += 1
             elif meth == 'weblink':
                 print("%-30s weblink (open manually, trusted only): %s" % (dom, tgt[:50]))
             else:
@@ -525,6 +529,7 @@ def cmd_unsub_run(M, domains, addr, pw):
             print("%-30s ERR %s" % (dom, str(e)[:40]))
     if smtp:
         smtp.quit()
+    return ok
 
 
 def cmd_wizard(provider):
@@ -543,31 +548,39 @@ def cmd_wizard(provider):
     print("\nConnected as %s.\nScanning your mailbox — this can take up to a minute…\n" % addr)
     bulk = search_bulk(M, days)
     dom = fetch_from(M, bulk)
-    junk = [(d, c) for d, c in dom.most_common(40) if not _is_protected(d)]
+    junk = [(d, c) for d, c in dom.most_common() if not _is_protected(d)]
     shielded = sum(1 for d, _ in dom.items() if _is_protected(d))
     M.logout()
     label = "any age" if days == 0 else "older than %d days" % days
-    print("Found %d promotional messages (%s). %d financial/protected senders auto-shielded.\n"
-          % (len(bulk), label, shielded))
+    print("Found %d promotional messages (%s) from %d senders. %d financial/protected senders auto-shielded.\n"
+          % (len(bulk), label, len(junk), shielded))
     if not junk:
         print("Nothing safe to clean in this mode.")
         if mode != "madmax":
             print("(Try MadMax for recent mail; for a large Yahoo backlog use Yahoo's web unsubscribe.)")
         return
-    print("Junk senders:")
-    for i, (d, c) in enumerate(junk[:25], 1):
+    # per-run batch scales with aggressiveness (unsubscribe fires one HTTP call per sender); re-run for the rest
+    CAP = {"sloth": 25, "normal": 50, "madmax": 100}[mode]
+    print("Top junk senders (this run handles up to %d):" % CAP)
+    for i, (d, c) in enumerate(junk[:CAP], 1):
         print("  %2d) %-34s %d" % (i, d, c))
+    if len(junk) > CAP:
+        rest = sum(c for _, c in junk[CAP:])
+        print("\n  …and %d more senders (%d msgs). Re-run to clear the next batch."
+              % (len(junk) - CAP, rest))
     skip = input("\nEnter numbers to SKIP (e.g. 2,5), or press Enter to include all: ").strip()
     skipset = {int(t) for t in skip.replace(" ", "").split(",") if t.isdigit()}
-    chosen = [junk[i] for i in range(min(25, len(junk))) if (i + 1) not in skipset]
+    chosen = [junk[i] for i in range(min(CAP, len(junk))) if (i + 1) not in skipset]
     if not chosen:
         print("Nothing selected. Done."); return
     doms = ",".join(d for d, _ in chosen)
     # Unsubscribe FIRST — while the mail is still in your mailbox (after it's in Trash the link's gone).
     if input("\nUNSUBSCRIBE from the %d selected senders first? [y/N] " % len(chosen)).strip().lower() == "y":
         M = connect(provider, addr, pw, readonly=True)
-        cmd_unsub_run(M, doms, addr, pw)
+        n_unsub = cmd_unsub_run(M, doms, addr, pw)
         M.logout()
+        if n_unsub:
+            track("unsub", provider, unsubs=n_unsub)
     if input("\nMove their mail to Trash? (recoverable) [y/N] ").strip().lower() == "y":
         cmd_sweep(provider, addr, pw, doms, days, yes=False)
         if input("\nProceed for real? [y/N] ").strip().lower() == "y":

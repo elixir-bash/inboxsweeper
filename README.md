@@ -23,6 +23,30 @@ anywhere. Deleted mail goes to Trash, so you can always get it back.
 
 ---
 
+## ⚡ Three cleaning modes — you pick the aggression
+
+The heart of InboxSweeper: **one dial from cautious to ruthless.** The wizard asks which mode
+you want before it touches anything. Banks, security, payments, receipts and government mail stay
+**protected in every mode** — the dial only changes how far back it reaches and how many senders
+it clears per run.
+
+| Mode | 🦥 Sloth | 🧹 Normal | 🔥 MadMax |
+|---|---|---|---|
+| | *safest* | *recommended* | *aggressive* |
+| **Reaches** | mail older than **2 years** | mail older than **1 year** | **all** promo mail, incl. recent |
+| **Senders / run** | **25** | **50** | **100** |
+
+```bash
+python3 inboxsweeper.py wizard              # asks you to pick a mode
+python3 inboxsweeper.py sweep --mode madmax # or set it directly on any command
+```
+
+Every sweep goes to **Trash** (recoverable ~30 days) and previews the count before anything moves.
+Hit the per-run cap? It tells you exactly how many senders remain — just run it again to clear the
+next batch.
+
+---
+
 ## Three ways to use it
 
 Pick the one that fits you:

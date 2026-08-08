@@ -26,6 +26,15 @@ h1 span{background:linear-gradient(90deg,#60a5fa,#4ade80);-webkit-background-cli
 .pillar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
 .pillar h3{margin:0 0 6px;font-size:17px} .pillar p{margin:0;color:var(--dim);font-size:14px}
 .pillar .ic{font-size:26px}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}
+.mode{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 22px;text-align:center}
+.mode.hot{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.mode .ic{font-size:34px}
+.mode h3{margin:8px 0 2px;font-size:20px}
+.mode .win{color:var(--dim);font-size:14px;margin:0 0 14px}
+.mode .cap{font-size:30px;font-weight:800;color:var(--good);line-height:1.1}
+.mode .cap small{display:block;font-size:12px;color:var(--dim);font-weight:500;letter-spacing:.3px;margin-top:2px}
+.mode .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;padding:3px 11px;border-radius:20px}
 section{padding:40px 0;border-top:1px solid var(--line)}
 h2{font-size:30px;letter-spacing:-.5px;margin:0 0 8px}
 .muted{color:var(--dim)}
@@ -46,7 +55,7 @@ code,.mono{font-family:ui-monospace,Menlo,monospace;font-size:13px}
 .install code{display:block;color:#cbd5e1;white-space:pre-wrap}
 footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid var(--line);font-size:14px}
 .roadmap li{color:var(--dim)}
-@media(max-width:720px){.pillars,.grid{grid-template-columns:1fr}h1{font-size:34px}}
+@media(max-width:720px){.pillars,.grid,.modes{grid-template-columns:1fr}h1{font-size:34px}}
 </style>
 </head>
 <body>
@@ -78,6 +87,39 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
   <div class="pillar"><div class="ic">🎁</div><h3>Free &amp; open</h3><p>MIT-licensed, no signup, no subscription, no upsell. Read every line of code.</p></div>
   <div class="pillar"><div class="ic">📬</div><h3>Gmail-first</h3><p>Full support for Gmail, with experimental support for Yahoo and other IMAP inboxes.</p></div>
 </div>
+
+<section id="modes">
+  <h2>Three modes. You pick the aggression. ⚡</h2>
+  <p class="muted">The heart of InboxSweeper: one dial from cautious to ruthless. Banks, security,
+   payments, receipts and government mail stay <b>protected in every mode</b> — the dial only
+   changes how far back it reaches and how many senders it clears per run.</p>
+  <div class="modes">
+    <div class="mode">
+      <div class="tag" style="background:#0b2f1e;color:var(--good)">SAFEST</div>
+      <div class="ic">🦥</div>
+      <h3>Sloth</h3>
+      <p class="win">Only mail older than <b>2 years</b></p>
+      <div class="cap">25<small>senders per run</small></div>
+    </div>
+    <div class="mode hot">
+      <div class="tag" style="background:#0b1e33;color:#60a5fa">RECOMMENDED</div>
+      <div class="ic">🧹</div>
+      <h3>Normal</h3>
+      <p class="win">Mail older than <b>1 year</b></p>
+      <div class="cap">50<small>senders per run</small></div>
+    </div>
+    <div class="mode">
+      <div class="tag" style="background:#331414;color:#f87171">AGGRESSIVE</div>
+      <div class="ic">🔥</div>
+      <h3>MadMax</h3>
+      <p class="win"><b>All</b> promo mail, incl. recent</p>
+      <div class="cap">100<small>senders per run</small></div>
+    </div>
+  </div>
+  <p class="muted" style="text-align:center;margin-top:20px;font-size:14px">Every sweep goes to
+   Trash (recoverable ~30 days) and previews the count before anything moves. Hit the per-run cap?
+   It tells you exactly how many senders remain — just run it again.</p>
+</section>
 
 <section id="why">
   <h2>Why your inbox stays messy — and why the usual fixes are worse</h2>
