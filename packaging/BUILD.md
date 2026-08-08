@@ -1,19 +1,18 @@
-# Building the standalone installers
+# Building the Windows installer
 
-Bundles Python + the tool into a double-click app (no Python needed by the end user).
+Most users don't need a build at all:
+
+- **macOS / Linux** — no build. Ship the source; users double-click `InboxSweeper.command`
+  (or run `python3 inboxsweeper.py serve`). The launcher installs the one dependency and
+  opens the browser UI.
+- **Windows** — the only prebuilt binary. A one-file `InboxSweeper.exe` for people who don't
+  want to install Python. Built below.
+
 The entry point is `app.py`, which launches the local browser UI (`webui.serve()`).
 
 ## Prereqs
 ```bash
 pip install pyinstaller requests
-```
-
-## macOS → `InboxSweeper.app`
-```bash
-pyinstaller --noconfirm --windowed --name InboxSweeper \
-  --collect-submodules requests --hidden-import webui --hidden-import inboxsweeper \
-  app.py
-# → dist/InboxSweeper.app   (zip it for distribution: cd dist && zip -r InboxSweeper-macos.zip InboxSweeper.app)
 ```
 
 ## Windows → `InboxSweeper.exe`
@@ -25,11 +24,12 @@ pyinstaller --noconfirm --onefile --name InboxSweeper ^
 REM → dist\InboxSweeper.exe
 ```
 
+In CI this happens automatically: `.github/workflows/release.yml` builds the `.exe` on
+`windows-latest` and attaches it to the GitHub Release on each `v*` tag.
+
 ## Notes
-- `--windowed` apps have no console, so `webui.serve()` guards its prints (`_say`) — don't
-  reintroduce bare `print()` in the serve path or the bundle will crash on launch.
-- Unsigned builds trigger Gatekeeper (macOS) / SmartScreen (Windows). Users bypass once via
-  right-click → Open. **Signing/notarization** (Apple Developer ID $99/yr; Windows cert)
-  removes the warning — that's the roadmap item for a truly one-click experience.
-- CI: a GitHub Actions workflow can build both on `macos-latest` + `windows-latest` and attach
-  them to a Release on each tag. Adding the workflow file needs a token with `workflow` scope.
+- `webui.serve()` guards its prints (`_say`) because a windowed/onefile bundle has no console —
+  don't reintroduce a bare `print()` in the serve path or the bundle can crash on launch.
+- The unsigned `.exe` trips SmartScreen once (**More info → Run anyway**). A signed build
+  (Windows code-signing cert) would remove the warning — that's the roadmap item for a truly
+  one-click experience.
