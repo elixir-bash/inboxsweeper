@@ -119,16 +119,21 @@ async function scan(){scanmsg.textContent="";results.classList.add('hide');start
  results.classList.remove('hide')}
 function selected(){return [...document.querySelectorAll('#rows input:checked')].map(c=>ROWS[c.dataset.i].domain)}
 function toggleAll(){document.querySelectorAll('#rows input:not([disabled])').forEach(c=>c.checked=all.checked)}
+function busy(b){document.querySelectorAll('#results button').forEach(x=>x.disabled=b)}
 async function sweep(){const d=selected();if(!d.length)return log("nothing selected");
- log("Previewing "+d.length+" senders…");const p=await api('/api/sweep',{provider:provider.value,domains:d,execute:false});
+ busy(true);log("Previewing "+d.length+" senders…");const p=await api('/api/sweep',{provider:provider.value,domains:d,execute:false});busy(false);
  if(p.error){log("error: "+p.error);return}
  if(!confirm("Move "+p.total+" messages from "+d.length+" senders to Trash? (recoverable)"))return;
- log("Moving…");const r=await api('/api/sweep',{provider:provider.value,domains:d,execute:true});
- log(r.error?("error: "+r.error):("Moved "+r.moved+" messages to Trash."))}
+ busy(true);log("Moving…");const r=await api('/api/sweep',{provider:provider.value,domains:d,execute:true});busy(false);
+ log(r.error?("error: "+r.error):("\\u2713 Done. Moved "+r.moved+" messages to Trash (recoverable)."))}
 async function unsub(){const d=selected();if(!d.length)return log("nothing selected");
- if(!confirm("Unsubscribe from "+d.length+" senders?"))return;log("Unsubscribing…");
- const r=await api('/api/unsub',{provider:provider.value,domains:d});
- if(r.error){log("error: "+r.error);return}r.results.forEach(x=>log("  "+x))}
+ if(!confirm("Unsubscribe from "+d.length+" senders?"))return;
+ busy(true);log("Unsubscribing from "+d.length+" senders… (a slow sender can take a few seconds — please wait)");
+ const r=await api('/api/unsub',{provider:provider.value,domains:d});busy(false);
+ if(r.error){log("error: "+r.error);return}
+ r.results.forEach(x=>log("  "+x));
+ const ok=r.results.filter(x=>x.includes('HTTP 2')||x.includes('mailto sent')).length;
+ log("\\u2713 Done. "+ok+"/"+d.length+" unsubscribed. Next → click \\u201c2. Move selected to Trash\\u201d.")}
 </script></body></html>"""
 
 
@@ -138,7 +143,7 @@ def _unsub_domain(M, domain, addr, pw, smtp_box):
         import requests
         r = requests.post(tgt, data="List-Unsubscribe=One-Click",
                           headers={"Content-Type": "application/x-www-form-urlencoded",
-                                   "User-Agent": "Mozilla/5.0"}, timeout=20)
+                                   "User-Agent": "Mozilla/5.0"}, timeout=8)
         return "%s — 1click HTTP %s" % (domain, r.status_code)
     if meth == "mailto":
         m = re.match(r"mailto:([^?]+)(\?(.*))?", tgt); to = m.group(1); subj = ""
