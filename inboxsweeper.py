@@ -208,7 +208,7 @@ def unsub_method(M, domain):
         t, d = M.uid('search', 'X-GM-RAW', '"from:%s in:anywhere"' % domain)
         ids = d[0].split() if d and d[0] else []
     else:
-        ids = search_sender(M, domain, days=1000)
+        ids = search_sender(M, domain, days=0)  # all-time — find any message to read its header
     if not ids:
         return ('none', '')
     # Full header (Yahoo returns empty for HEADER.FIELDS of List-Unsubscribe).
