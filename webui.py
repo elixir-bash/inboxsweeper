@@ -31,8 +31,27 @@ table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;
 #log{white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,monospace;color:#9aa4b2;margin-top:10px;max-height:220px;overflow:auto}
 .hint{color:#8a94a6;font-size:13px} a{color:#60a5fa}
 .hide{display:none}
+.topbar{display:flex;align-items:center;justify-content:space-between}
+.gh{font-size:13px;color:#8a94a6;text-decoration:none;border:1px solid #232a36;padding:6px 12px;border-radius:8px}
+.gh:hover{color:#e6e6e6;border-color:#3b82f6}
+.foot{margin:26px 0 8px;text-align:center;color:#6b7280;font-size:12px}
+/* scanning animation */
+#scanner{position:relative;overflow:hidden;background:#080d15;border:1px solid #1b2431;border-radius:10px;
+ padding:14px 16px;margin-top:12px;font:12.5px/1.7 ui-monospace,Menlo,monospace;color:#4ade80;min-height:132px}
+#scanner .sweep{position:absolute;left:0;right:0;top:-64px;height:64px;pointer-events:none;
+ background:linear-gradient(180deg,rgba(59,130,246,.20),transparent);animation:sweep 1.8s ease-in-out infinite}
+@keyframes sweep{0%{top:-64px}100%{top:100%}}
+#scanner .hdr{color:#60a5fa} #scanner .cur{animation:blink 1s steps(1) infinite}
+#scanner #spin{color:#f5c451}
+@keyframes blink{50%{opacity:0}}
+#scanConsole{margin-top:8px;white-space:pre-wrap}
+#scanConsole .ln{opacity:0;animation:fadein .25s forwards}
+@keyframes fadein{to{opacity:1}}
 </style></head><body>
-<h1>InboxSweeper</h1>
+<div class=topbar>
+ <h1>InboxSweeper</h1>
+ <a class=gh href="https://github.com/elixir-bash/inboxsweeper" target=_blank rel=noopener>★ Star on GitHub</a>
+</div>
 <p class=sub>Clean up and unsubscribe from promotional email. Deletions go to Trash (recoverable).</p>
 
 <div class=card id=connect>
@@ -50,14 +69,21 @@ table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;
 <div class=card id=main style="display:none">
  <button onclick=scan()>Scan my inbox</button>
  <span class=hint id=scanmsg></span>
+ <div id=scanner class=hide><div class=sweep></div>
+  <span class=hdr>inboxsweeper</span> <span id=spin>⠋</span> · envelopes examined: <span id=scanCount>0</span> <span class=cur>▋</span>
+  <div id=scanConsole></div>
+ </div>
  <div id=results class=hide>
   <table><thead><tr><th><input type=checkbox id=all onclick=toggleAll()></th><th>Sender</th><th>#</th><th>Unsubscribe</th><th></th></tr></thead>
   <tbody id=rows></tbody></table>
-  <button class=danger onclick=sweep()>Move selected to Trash</button>
-  <button class=ghost onclick=unsub()>Unsubscribe from selected</button>
+  <p class=hint style="margin-top:14px">Recommended order: <b>unsubscribe first</b>, then move to Trash — once mail is in the Trash its unsubscribe link can no longer be read.</p>
+  <button onclick=unsub()>1. Unsubscribe from selected</button>
+  <button class=danger onclick=sweep()>2. Move selected to Trash</button>
  </div>
  <div id=log></div>
 </div>
+<p class=foot>Free &amp; open source · runs 100% on your machine ·
+ <a href="https://github.com/elixir-bash/inboxsweeper" target=_blank rel=noopener>github.com/elixir-bash/inboxsweeper</a></p>
 <script>
 const T="__TOKEN__";
 const help={gmail:"Turn on 2-Step Verification, then create one at <a href=https://myaccount.google.com/apppasswords target=_blank>myaccount.google.com/apppasswords</a>.",
@@ -70,8 +96,17 @@ async function connect(){cstatus.textContent="Verifying…";const r=await api('/
  if(r.ok){cstatus.textContent="Connected ✓";document.getElementById('main').style.display='block';document.getElementById('connect').style.opacity=.6}
  else cstatus.textContent="Failed: "+r.error}
 let ROWS=[];
-async function scan(){scanmsg.textContent=" scanning… (can take ~20s)";results.classList.add('hide');
- const r=await api('/api/scan',{provider:provider.value});scanmsg.textContent="";
+const SPIN=["\\u280b","\\u2819","\\u2839","\\u2838","\\u283c","\\u2834","\\u2826","\\u2827","\\u2807","\\u280f"];
+const SCAN_MSGS=["opening IMAP socket…","authenticating app password…","enumerating mailbox…","fetching envelopes…","grouping by sender…","reading List-Unsubscribe headers…","scoring bulk vs. personal…","shielding banks, receipts & bookings…","ranking noisiest senders…"];
+let scanTimers=[];
+function startScan(){const box=document.getElementById('scanner'),con=document.getElementById('scanConsole');
+ box.classList.remove('hide');con.innerHTML="";let si=0,mi=0,n=0;
+ scanTimers.push(setInterval(()=>{document.getElementById('spin').textContent=SPIN[si=(si+1)%SPIN.length]},80));
+ scanTimers.push(setInterval(()=>{if(mi<SCAN_MSGS.length){const d=document.createElement('div');d.className='ln';d.textContent="\\u203a "+SCAN_MSGS[mi++];con.appendChild(d);con.scrollTop=1e9}},520));
+ scanTimers.push(setInterval(()=>{n+=7+Math.floor(Math.random()*40);document.getElementById('scanCount').textContent=n.toLocaleString()},110));}
+function stopScan(){scanTimers.forEach(clearInterval);scanTimers=[];document.getElementById('scanner').classList.add('hide');}
+async function scan(){scanmsg.textContent="";results.classList.add('hide');startScan();
+ const r=await api('/api/scan',{provider:provider.value});stopScan();
  if(r.error){log("scan error: "+r.error);return}
  ROWS=r.senders;const tb=document.getElementById('rows');tb.innerHTML="";
  ROWS.forEach((s,i)=>{const tr=document.createElement('tr');
@@ -167,23 +202,31 @@ class H(BaseHTTPRequestHandler):
                 M = E.connect(prov, addr, pw, readonly=True)
                 total = sum(len(E.search_sender(M, d, 365)) for d in domains); M.logout()
                 return {"total": total}
-            M = E.connect(prov, addr, pw, readonly=False); moved = 0
+            M = E.connect(prov, addr, pw, readonly=False); moved = 0; freed = 0
             for d in domains:
-                moved += E.move_to_trash(M, E.search_sender(M, d, 365))
+                uids = E.search_sender(M, d, 365)
+                freed += E.total_size(M, uids)   # size before the move, while UIDs are still valid
+                moved += E.move_to_trash(M, uids)
             M.logout()
+            E.track("sweep", prov, emails=moved, size_bytes=freed)
             return {"moved": moved}
         if path == "/api/unsub":
-            M = E.connect(prov, addr, pw, readonly=True); box = [None]; res = []
+            M = E.connect(prov, addr, pw, readonly=True); box = [None]; res = []; ok = 0
             for d in req["domains"]:
                 if E._is_protected(d):
                     res.append("%s — protected, skipped" % d); continue
                 try:
-                    res.append(_unsub_domain(M, d, addr, pw, box))
+                    line = _unsub_domain(M, d, addr, pw, box)
+                    if "mailto sent" in line or "HTTP 2" in line:   # 2xx = accepted
+                        ok += 1
+                    res.append(line)
                 except Exception as e:
                     res.append("%s — ERR %s" % (d, str(e)[:40]))
             if box[0]:
                 box[0].quit()
             M.logout()
+            if ok:
+                E.track("unsub", prov, unsubs=ok)
             return {"results": res}
         return {"error": "unknown endpoint"}
 
