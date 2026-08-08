@@ -210,10 +210,10 @@ skipped.
 
 ## The story behind it
 
-I'm a techie, and for the better part of 15 years I've quietly waged war on my own inbox. It
-started the way these things always do: a small IMAP script to nuke the obvious promotions. Then
-another for newsletters. Then a cron job, once a month, to hold the pile back while I wasn't
-looking.
+I have a habit of pointing a bit of code at the everyday annoyances in my life. For the better part
+of 15 years, my inbox was the one that never stayed solved. It started the way these things always
+do: a small IMAP script to nuke the obvious promotions. Then another for newsletters. Then a cron
+job, once a month, to hold the pile back while I wasn't looking.
 
 The trouble is email never sits still. Every so often something underneath would shift — Google
 killed off "less secure app" access and I had to move everything onto 2-factor and app passwords;
