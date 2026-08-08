@@ -396,6 +396,12 @@ def run_setup(provider):
 # --------------------------------------------------------------- commands ------
 def cmd_counts(M):
     P = PROVIDERS[M._prov]
+    if P["backend"] != "gmail":
+        print("⚠  EXPERIMENTAL (%s): over IMAP, %s exposes only your ~10,000 most-recent messages"
+              % (M._prov, M._prov.title()))
+        print("   per folder — older mail is NOT reachable here. For a larger backlog, use %s's"
+              % M._prov.title())
+        print("   own web unsubscribe (Settings → More Settings → Subscriptions). Gmail has no cap.\n")
     if P["backend"] == "gmail":
         def n(q):
             t, d = M.uid('search', 'X-GM-RAW', '"%s"' % q)

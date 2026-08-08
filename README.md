@@ -2,9 +2,10 @@
 
 **Clean years of junk out of your inbox — for free, without handing your email to anyone.**
 
-InboxSweeper deletes old promotions and newsletters in bulk and unsubscribes you from the noise
-— across **Gmail, Yahoo, and other email accounts**. It runs entirely on **your own computer**;
-your email is never uploaded anywhere. Deleted mail goes to Trash, so you can always get it back.
+InboxSweeper deletes old promotions and newsletters in bulk and unsubscribes you from the noise.
+Built for **Gmail** today, with **experimental** support for **Yahoo and other IMAP** inboxes
+(see the note below). It runs entirely on **your own computer**; your email is never uploaded
+anywhere. Deleted mail goes to Trash, so you can always get it back.
 
 - 🆓 **Free and open source** — no account, no subscription, no catch.
 - 🔒 **Private** — everything happens on your machine; nothing is sent to a company.
@@ -98,11 +99,16 @@ That's the whole journey. Everything below is for people who want the individual
 - `pip install -r requirements.txt` (only `requests`, and only for `unsub-run`)
 - A **Gmail or Yahoo** account with **2-Step Verification ON** (required for app passwords)
 
-> **Yahoo users:** the flow is identical — create the app password at
+> **⚠️ Yahoo / other IMAP is experimental.** It works, but with a big caveat: **Yahoo's IMAP only
+> exposes your ~10,000 most-recent messages per folder** — older mail simply isn't reachable, and
+> Yahoo's server-side search is limited. For a large Yahoo backlog, use **Yahoo's own web
+> unsubscribe** (Yahoo Mail → Settings → More Settings → *Subscriptions*), which isn't capped.
+> Gmail has no such limits — that's the primary, fully-supported target.
+>
+> Setup (if you still want it): create an app password at
 > [login.yahoo.com/account/security](https://login.yahoo.com/account/security) → *Create app
-> password* under "External connections", confirm IMAP is on (Yahoo Mail → Settings → More
-> Settings → Mailboxes), then use `--provider yahoo` on any command. The `setup`/`wizard`
-> commands print these steps for you.
+> password* under "External connections", confirm IMAP is on (Settings → More Settings →
+> Mailboxes), then add `--provider yahoo` to any command.
 
 ## 2. Create a Gmail app password (step by step)
 
