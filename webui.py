@@ -34,7 +34,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;
 .topbar{display:flex;align-items:center;justify-content:space-between}
 .gh{font-size:13px;color:#8a94a6;text-decoration:none;border:1px solid #232a36;padding:6px 12px;border-radius:8px}
 .gh:hover{color:#e6e6e6;border-color:#3b82f6}
-.foot{margin:26px 0 8px;text-align:center;color:#6b7280;font-size:12px}
+.foot{margin:28px 0 8px;padding-top:18px;border-top:1px solid #232a36;text-align:center;color:#6b7280;font-size:12px;line-height:1.7}
 /* scanning animation */
 #scanner{position:relative;overflow:hidden;background:#080d15;border:1px solid #1b2431;border-radius:10px;
  padding:14px 16px;margin-top:12px;font:12.5px/1.7 ui-monospace,Menlo,monospace;color:#4ade80;min-height:132px}
@@ -82,8 +82,11 @@ table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;
  </div>
  <div id=log></div>
 </div>
-<p class=foot>Free &amp; open source · runs 100% on your machine ·
- <a href="https://github.com/elixir-bash/inboxsweeper" target=_blank rel=noopener>github.com/elixir-bash/inboxsweeper</a></p>
+<footer class=foot>
+ Made for people who want their inbox back. ·
+ <a href="https://github.com/elixir-bash/inboxsweeper" target=_blank rel=noopener>GitHub</a> · MIT License<br>
+ Your mail stays yours — nothing here ever leaves your machine.
+</footer>
 <script>
 const T="__TOKEN__";
 const help={gmail:"Turn on 2-Step Verification, then create one at <a href=https://myaccount.google.com/apppasswords target=_blank>myaccount.google.com/apppasswords</a>.",
