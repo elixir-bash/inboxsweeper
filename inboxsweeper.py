@@ -60,6 +60,10 @@ PROTECT_DOMAIN_KW = ["bank", "amex", "americanexpress", "experian", "equifax", "
 PROTECT_KW = ["receipt", "invoice", "order", "booking", "reservation", "ticket",
               "statement", "tax", "refund", "payment", "confirmation"]
 
+# Cleaning modes → how far back "bulk to clean" reaches (days). Financial/bank/transactional
+# shielding stays ON in EVERY mode — MadMax just widens the age window, it doesn't drop protection.
+MODES = {"sloth": 730, "normal": 365, "madmax": 0}   # 0 = all-time (includes recent spam)
+
 
 # --------------------------------------------------------------- credentials ---
 def _keychain(service, account):
@@ -152,13 +156,18 @@ def _has_unsub(M, uids):
     """Keep UIDs whose message carries a List-Unsubscribe header. Fetches the FULL header block —
     Yahoo's IMAP returns empty for HEADER.FIELDS(List-Unsubscribe), so a field-scoped fetch misses everything."""
     keep = []
-    for i in range(0, len(uids), 200):
+    n = len(uids)
+    for i in range(0, n, 200):
+        if n > 400:
+            sys.stderr.write("\r  scanning %d/%d messages…" % (min(i + 200, n), n)); sys.stderr.flush()
         t, d = M.uid('fetch', b','.join(uids[i:i + 200]), '(UID BODY.PEEK[HEADER])')
         for it in d or []:
             if isinstance(it, tuple):
                 m = re.search(rb'UID (\d+)', it[0])
                 if m and b'list-unsubscribe:' in it[1].lower():
                     keep.append(m.group(1))
+    if n > 400:
+        sys.stderr.write("\r" + " " * 44 + "\r"); sys.stderr.flush()
     return keep
 
 
@@ -394,7 +403,7 @@ def run_setup(provider):
 
 
 # --------------------------------------------------------------- commands ------
-def cmd_counts(M):
+def cmd_counts(M, days=365):
     P = PROVIDERS[M._prov]
     if P["backend"] != "gmail":
         print("⚠  EXPERIMENTAL (%s): over IMAP, %s exposes only your ~10,000 most-recent messages"
@@ -413,11 +422,11 @@ def cmd_counts(M):
     else:
         t, d = M.uid('search', None, 'ALL'); total = len(d[0].split()) if d and d[0] else 0
         print("%-28s %d" % ("total in %s" % M._mailbox, total))
-    print("%-28s %d" % ("bulk (old + unsubscribe)", len(search_bulk(M))))
+    print("%-28s %d" % ("bulk (has unsubscribe)", len(search_bulk(M, days))))
 
 
-def cmd_profile(M, top):
-    uids = search_bulk(M)
+def cmd_profile(M, top, days=365):
+    uids = search_bulk(M, days)
     dom = fetch_from(M, uids)
     print("bulk candidates: %d   distinct senders: %d\n" % (len(uids), len(dom)))
     for d, c in dom.most_common(top):
@@ -520,32 +529,50 @@ def cmd_unsub_run(M, domains, addr, pw):
 
 def cmd_wizard(provider):
     print("\n== InboxSweeper (%s) ==" % provider)
-    print("Safe by design: nothing is deleted permanently — mail is moved to Trash,")
-    print("which you can restore for ~30 days.\n")
+    print("Safe by design: deleted mail goes to Trash (recoverable ~30 days).\n")
+    print("Cleaning mode:")
+    print("  1) Sloth   — only mail older than 2 years  (safest)")
+    print("  2) Normal  — mail older than 1 year         (recommended)")
+    print("  3) MadMax  — ALL promo mail, incl. recent   (aggressive)")
+    print("  Banks, credit, payments & receipts stay protected in every mode.")
+    mode = {"1": "sloth", "2": "normal", "3": "madmax"}.get(input("Pick [1/2/3, default 2]: ").strip(), "normal")
+    days = MODES[mode]
+    print("→ %s mode.\n" % mode)
     addr, pw = ensure_creds(provider, interactive=True)
     M = connect(provider, addr, pw, readonly=True)
-    print("\nConnected as %s. Scanning...\n" % addr)
-    cmd_counts(M)
-    print("\nTop bulk senders (old mail with an unsubscribe link):\n")
-    dom = fetch_from(M, search_bulk(M))
+    print("\nConnected as %s.\nScanning your mailbox — this can take up to a minute…\n" % addr)
+    bulk = search_bulk(M, days)
+    dom = fetch_from(M, bulk)
     junk = [(d, c) for d, c in dom.most_common(40) if not _is_protected(d)]
-    for d, c in junk[:25]:
-        print("  %-34s %d" % (d, c))
+    shielded = sum(1 for d, _ in dom.items() if _is_protected(d))
     M.logout()
+    label = "any age" if days == 0 else "older than %d days" % days
+    print("Found %d promotional messages (%s). %d financial/protected senders auto-shielded.\n"
+          % (len(bulk), label, shielded))
     if not junk:
-        print("\nNothing obvious to clean. Done."); return
-    doms = ",".join(d for d, _ in junk)
-    # Unsubscribe FIRST — while the mail is still in your mailbox (after it's in Trash we can't
-    # read the unsubscribe link).
-    if input("\nUNSUBSCRIBE from these senders? (best to do this first) [y/N] ").strip().lower() == "y":
+        print("Nothing safe to clean in this mode.")
+        if mode != "madmax":
+            print("(Try MadMax for recent mail; for a large Yahoo backlog use Yahoo's web unsubscribe.)")
+        return
+    print("Junk senders:")
+    for i, (d, c) in enumerate(junk[:25], 1):
+        print("  %2d) %-34s %d" % (i, d, c))
+    skip = input("\nEnter numbers to SKIP (e.g. 2,5), or press Enter to include all: ").strip()
+    skipset = {int(t) for t in skip.replace(" ", "").split(",") if t.isdigit()}
+    chosen = [junk[i] for i in range(min(25, len(junk))) if (i + 1) not in skipset]
+    if not chosen:
+        print("Nothing selected. Done."); return
+    doms = ",".join(d for d, _ in chosen)
+    # Unsubscribe FIRST — while the mail is still in your mailbox (after it's in Trash the link's gone).
+    if input("\nUNSUBSCRIBE from the %d selected senders first? [y/N] " % len(chosen)).strip().lower() == "y":
         M = connect(provider, addr, pw, readonly=True)
         cmd_unsub_run(M, doms, addr, pw)
         M.logout()
-    if input("\nMove OLD mail from these senders to Trash? (recoverable) [y/N] ").strip().lower() == "y":
-        cmd_sweep(provider, addr, pw, doms, 365, yes=False)
+    if input("\nMove their mail to Trash? (recoverable) [y/N] ").strip().lower() == "y":
+        cmd_sweep(provider, addr, pw, doms, days, yes=False)
         if input("\nProceed for real? [y/N] ").strip().lower() == "y":
-            cmd_sweep(provider, addr, pw, doms, 365, yes=True)
-    print("\nTip: after checking Trash looks right, empty it in your webmail. Re-run quarterly.")
+            cmd_sweep(provider, addr, pw, doms, days, yes=True)
+    print("\nTip: check Trash looks right, then empty it in your webmail. Re-run quarterly.")
 
 
 # ------------------------------------------------------------------- main ------
@@ -553,6 +580,8 @@ def main():
     base = argparse.ArgumentParser(add_help=False)
     base.add_argument("--provider", choices=list(PROVIDERS), default="gmail",
                       help="mail provider (default: gmail)")
+    base.add_argument("--mode", choices=list(MODES), default="normal",
+                      help="aggressiveness: sloth (>2yr) | normal (>1yr, default) | madmax (all, incl. recent)")
     p = argparse.ArgumentParser(prog="inboxsweeper", description=__doc__.splitlines()[0])
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("serve", parents=[base], help="open the browser UI (easiest, no terminal after launch)")
@@ -563,7 +592,7 @@ def main():
     x = sub.add_parser("unsub-list", parents=[base]); x.add_argument("--top", type=int, default=40)
     x = sub.add_parser("sweep", parents=[base])
     x.add_argument("--senders", help="comma-separated domains; omit to target all non-protected bulk senders")
-    x.add_argument("--days", type=int, default=365); x.add_argument("--yes", action="store_true")
+    x.add_argument("--days", type=int, default=None, help="override the mode's age window"); x.add_argument("--yes", action="store_true")
     x = sub.add_parser("unsub-run", parents=[base]); x.add_argument("--domains", required=True)
     x = sub.add_parser("block", parents=[base], help="delete a sender's mail + block them so future mail is auto-cleaned")
     x.add_argument("--senders", required=True); x.add_argument("--yes", action="store_true")
@@ -589,7 +618,8 @@ def main():
         cmd_wizard(prov); return
     if a.cmd == "sweep":
         addr, pw = ensure_creds(prov, interactive=False)
-        cmd_sweep(prov, addr, pw, a.senders, a.days, a.yes); return
+        days = a.days if a.days is not None else MODES[a.mode]
+        cmd_sweep(prov, addr, pw, a.senders, days, a.yes); return
     if a.cmd == "block":
         addr, pw = ensure_creds(prov, interactive=False)
         cmd_block(prov, addr, pw, a.senders, a.yes); return
@@ -600,8 +630,8 @@ def main():
     addr, pw = ensure_creds(prov, interactive=False)
     M = connect(prov, addr, pw, readonly=True)
     try:
-        if a.cmd == "counts": cmd_counts(M)
-        elif a.cmd == "profile": cmd_profile(M, a.top)
+        if a.cmd == "counts": cmd_counts(M, MODES[a.mode])
+        elif a.cmd == "profile": cmd_profile(M, a.top, MODES[a.mode])
         elif a.cmd == "unsub-list": cmd_unsub_list(M, a.top)
         elif a.cmd == "unsub-run": cmd_unsub_run(M, a.domains, addr, pw)
     finally:
