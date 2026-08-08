@@ -213,13 +213,16 @@ skipped.
 For years I cleaned my inbox by hand — thousands of promotions and newsletters, one tedious pass at
 a time. Eventually I started writing small scripts to take some of the load off, and over several
 years those grew into a messy but working pile of code I'd run whenever the clutter got unbearable.
-It did the job, barely, and only I could run it.
+I even had cron jobs firing every other week to hold the mess back — and every so often one would
+break, and I'd patch it, year after year, just to keep it limping along. It did the job, barely,
+and only I could run it.
 
-This year, working with AI, I finally built the thing I'd always pictured — not a heap of scripts,
-but a real app: the cleaning modes, the safe-by-default sweeps, the one-click unsubscribe, the
-browser UI, the whole construct exactly as I'd envisioned it. And then the step I'd never gotten
-around to on my own — making it **open source**, so anyone can clean their inbox the same way, for
-free, without handing their mail to a company.
+This year, working with AI, I finally fixed the *core* instead of the symptoms and built the thing
+I'd always pictured — not a heap of patched scripts, but a real app: the cleaning modes, the
+safe-by-default sweeps, the one-click unsubscribe, the browser UI, the whole construct exactly as
+I'd envisioned it. And then the step I'd never gotten around to on my own — making it **open
+source**, so anyone can clean their inbox the same way, for free, without handing their mail to a
+company.
 
 That's what InboxSweeper is: years of doing this the hard way, finally turned into something anyone
 can use.
