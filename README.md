@@ -210,19 +210,33 @@ skipped.
 
 ## The story behind it
 
-For years I cleaned my inbox by hand — thousands of promotions and newsletters, one tedious pass at
-a time. Eventually I started writing small scripts to take some of the load off, and over several
-years those grew into a messy but working pile of code I'd run whenever the clutter got unbearable.
-I even had cron jobs firing every other week to hold the mess back — and every so often one would
-break, and I'd patch it, year after year, just to keep it limping along. It did the job, barely,
-and only I could run it.
+I'm a techie, and for the better part of 15 years I've quietly waged war on my own inbox. It
+started the way these things always do: a small IMAP script to nuke the obvious promotions. Then
+another for newsletters. Then a cron job, once a month, to hold the pile back while I wasn't
+looking.
 
-This year, working with AI, I finally fixed the *core* instead of the symptoms and built the thing
-I'd always pictured — not a heap of patched scripts, but a real app: the cleaning modes, the
-safe-by-default sweeps, the one-click unsubscribe, the browser UI, the whole construct exactly as
-I'd envisioned it. And then the step I'd never gotten around to on my own — making it **open
-source**, so anyone can clean their inbox the same way, for free, without handing their mail to a
-company.
+The trouble is email never sits still. Every so often something underneath would shift — Google
+killed off "less secure app" access and I had to move everything onto 2-factor and app passwords;
+the special folders never behaved the same across providers (`[Gmail]/Trash` here, "Bin" there);
+IMAP search would quietly change what it returned; Yahoo would only hand back your ten thousand
+most-recent messages; a provider would tighten rate limits or rotate a port. The cron would break,
+usually silently, and I'd only notice weeks later when the clutter had crept back in. So I patched.
+Year after year, one more fix stacked on the last.
+
+But the part I could never fully automate away was the careful bit — the **plumbing and cleaning**.
+Bulk-deleting email is easy; bulk-deleting *only* the junk and never once touching what matters is
+hard. A bank statement, a flight confirmation, a receipt I'd need at tax time — those can't land in
+Trash by accident. So most of my years of tinkering weren't about deleting faster; they were about
+drawing the line ever more carefully: expanding the list of protected senders, teaching it to
+recognize a financial or government domain, making sure even the most aggressive sweep still
+stepped around anything critical.
+
+This year, working with AI, I finally stopped patching the symptoms and fixed the *core*. The
+fragile scripts became a real app — the cleaning modes, the safe-by-default sweeps that always go
+to Trash, the automatic shield around bank, security and government mail, real one-click
+unsubscribe, a browser UI. The whole construct I'd carried in my head for a decade, done properly.
+And then the step I'd never gotten around to alone: making it **open source**, so anyone can clean
+their inbox the same careful way — for free, and without ever handing their mail to a company.
 
 That's what InboxSweeper is: years of doing this the hard way, finally turned into something anyone
 can use.
