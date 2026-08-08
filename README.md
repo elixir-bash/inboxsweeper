@@ -47,6 +47,26 @@ next batch.
 
 ---
 
+## 🎯 Three actions — and when to use each
+
+The mode above decides *how far back* to reach. Once you've scanned, you choose *what to do* with a
+sender. There are three, and picking the right one matters:
+
+| Action | Use it when… | What it does |
+|---|---|---|
+| ✉️ **Unsubscribe** | you **recognize** the sender | Real one-click / mailto unsubscribe — stops it at the source |
+| 🗑️ **Move to Trash** | you're just done with it | Clears the backlog to Trash (recoverable ~30 days) |
+| 🚩 **Report spam** | you **don't recognize** it | Trains your provider's filter so future mail auto-junks |
+
+> **The one rule that matters most:** recognize a sender → **unsubscribe**; don't recognize it →
+> **report spam, never unsubscribe.** Clicking unsubscribe on real spam confirms your address is
+> live and gets you *more* spam. That's why **Report spam** is a **separate, deliberate action** —
+> in the app it's its own tab that starts with *nothing* selected, and in the terminal it's the
+> `spam` command (or option 2 in the wizard). It never runs in bulk by accident, and it can never
+> touch a financial/security/government sender.
+
+---
+
 ## Four ways to use it
 
 Pick the one that fits you:
@@ -101,12 +121,13 @@ python3 inboxsweeper.py wizard --provider yahoo   # Yahoo
 ```
 
 The wizard walks you through everything, in plain language:
-1. If it's your first run, it prints the exact steps to create an **app password** and asks
+1. First it asks what you want to do: **Clean up** (unsubscribe + move to Trash) or **Report spam**.
+2. If it's your first run, it prints the exact steps to create an **app password** and asks
    you to paste it once (hidden). It's stored securely (macOS Keychain, or a locked file).
-2. It scans your mailbox and shows your noisiest bulk senders.
-3. It asks — in y/N prompts — whether to move that old mail to **Trash** (recoverable) and
-   whether to **unsubscribe**. Nothing happens without your yes, and it always previews counts
-   before moving anything.
+3. It scans your mailbox and shows your noisiest bulk senders.
+4. **Clean up** asks — in y/N prompts — whether to **unsubscribe** (first) then move that mail to
+   **Trash**. **Report spam** starts with *nothing* selected and asks which senders to flag.
+   Nothing happens without your yes, and it always previews counts before moving anything.
 
 That's the whole journey. Everything below is for people who want the individual commands.
 
@@ -185,13 +206,14 @@ python3 inboxsweeper.py unsub-run --domains "email-marriott.com,mail.zillow.com,
 
 | Command | Purpose |
 |---|---|
-| `wizard` | **Start here.** Guided end-to-end: setup → scan → confirm → clean → unsubscribe |
+| `wizard` | **Start here.** Guided: first pick **Clean up** (unsubscribe + Trash) or **Report spam** |
 | `setup` | Store credentials for a provider (prints the app-password steps) |
 | `counts` | Landscape of your mailbox (sizes by category / bulk) |
 | `profile --top N` | Tally the noisiest bulk senders |
 | `unsub-list --top N` | Senders + unsubscribe method (`1click`/`mailto`/`weblink`/`none`) |
 | `sweep [--senders a.com,b.com] [--days 365] [--yes]` | Move a sender's old mail to Trash. **Dry-run unless `--yes`.** |
 | `unsub-run --domains a.com,b.com` | Execute unsubscribe (one-click POST or mailto/SMTP) |
+| `spam --senders a.com,b.com [--yes]` | **Report** specific senders as spam (trains your filter). Deliberate & opt-in — never bulk. **Dry-run unless `--yes`.** |
 
 Add `--provider gmail` (default) or `--provider yahoo` to any command. `sweep` targets by
 **sender** (the safe way — see the built-in safety rules); omit `--senders` to target every
@@ -294,3 +316,9 @@ content — your mail still never leaves your machine. Turn it off completely wi
 ## License
 
 MIT — see [`LICENSE`](LICENSE). Personal tool; use at your own risk. Always dry-run first.
+
+## Author
+
+Built by **Mukundan Govindaraj** — [LinkedIn](https://www.linkedin.com/in/gmukundan/) ·
+[GitHub](https://github.com/elixir-bash). If InboxSweeper helps you, a ⭐ on the repo or a
+hello on LinkedIn is genuinely appreciated.

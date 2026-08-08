@@ -123,6 +123,7 @@ def connect(provider, addr, pw, readonly=True):
     M.login(addr, pw.replace(" ", ""))
     mailbox = P["mailbox_fallback"]
     trash = "Trash"
+    spam = None
     for b in (M.list()[1] or []):
         s = b.decode(errors="ignore")
         name = s.split(' "/" ')[-1].strip().strip('"') if ' "/" ' in s else s.rsplit(" ", 1)[-1].strip('"')
@@ -130,7 +131,10 @@ def connect(provider, addr, pw, readonly=True):
             mailbox = name
         if "\\Trash" in s or name.lower() in ("trash", "bin", "deleted", "[gmail]/bin", "[gmail]/trash"):
             trash = name
+        if "\\Junk" in s or name.lower() in ("spam", "junk", "bulk", "bulk mail", "[gmail]/spam"):
+            spam = name
     M._prov, M._mailbox, M._trash = provider, mailbox, trash
+    M._spam = spam or ("[Gmail]/Spam" if provider == "gmail" else "Bulk")
     M.select('"%s"' % mailbox, readonly=readonly)
     return M
 
@@ -248,6 +252,24 @@ def move_to_trash(M, uids, batch=300):
             M.uid('MOVE', b','.join(chunk), '"%s"' % M._trash)
         except imaplib.IMAP4.error:  # server without MOVE → COPY + delete + expunge
             M.uid('COPY', b','.join(chunk), '"%s"' % M._trash)
+            M.uid('STORE', b','.join(chunk), '+FLAGS', '(\\Deleted)')
+            M.expunge()
+        moved += len(chunk)
+        time.sleep(1.2)
+    return moved
+
+
+def move_to_spam(M, uids, batch=300):
+    """Move messages to the provider's Spam/Junk folder. On Gmail/Yahoo this also trains the
+    filter, so future mail from the sender is auto-junked. Heavier than Trash — caller must
+    make it a deliberate, opt-in action, never the default."""
+    moved = 0
+    for i in range(0, len(uids), batch):
+        chunk = uids[i:i + batch]
+        try:
+            M.uid('MOVE', b','.join(chunk), '"%s"' % M._spam)
+        except imaplib.IMAP4.error:  # server without MOVE → COPY + delete + expunge
+            M.uid('COPY', b','.join(chunk), '"%s"' % M._spam)
             M.uid('STORE', b','.join(chunk), '+FLAGS', '(\\Deleted)')
             M.expunge()
         moved += len(chunk)
@@ -476,6 +498,38 @@ def cmd_sweep(provider, addr, pw, senders, days, yes):
     return (moved, freed)
 
 
+def cmd_spam(provider, addr, pw, senders, days, yes):
+    """Report specific senders as spam (deliberate, opt-in). senders is REQUIRED — spam is never
+    an 'all bulk' action. days defaults to 0 (all ages) so a flagged sender is fully cleared."""
+    targets = [s.strip() for s in (senders or "").split(",") if s.strip()]
+    if not targets:
+        print("No senders given. Spam is deliberate — pass --senders a.com,b.com"); return 0
+    M = connect(provider, addr, pw, readonly=True)
+    total = 0; plan = []
+    for dom in targets:
+        if _is_protected(dom):
+            print("skip (protected, never reported): %s" % dom); continue
+        uids = search_sender(M, dom, days)
+        plan.append((dom, len(uids))); total += len(uids)
+    for dom, n in plan:
+        print("  %-34s %d msgs" % (dom, n))
+    print("TOTAL to report as spam → %s: %d messages from %d senders" % (M._spam, total, len(plan)))
+    print("⚠ This trains your spam filter. Only report senders you don't recognize.")
+    if not yes:
+        print("\nDRY RUN. Re-run with --yes to report them as spam."); M.logout(); return 0
+    M.logout()
+    M = connect(provider, addr, pw, readonly=False)
+    moved = 0
+    for dom, _ in plan:
+        uids = search_sender(M, dom, days)
+        moved += move_to_spam(M, uids)
+        print("  reported %s (%d)" % (dom, len(uids)))
+    print("DONE. Reported %d messages as spam (moved to %s)." % (moved, M._spam))
+    M.logout()
+    track("spam", provider, emails=moved)
+    return moved
+
+
 def cmd_block(provider, addr, pw, senders, yes):
     doms = [s.strip() for s in senders.split(",") if s.strip()]
     add_blocklist(provider, doms)
@@ -532,10 +586,42 @@ def cmd_unsub_run(M, domains, addr, pw):
     return ok
 
 
+def _wizard_spam(provider):
+    print("\n— Report spam —")
+    print("Reporting trains your spam filter, so their future mail is auto-junked too.")
+    print("Only flag senders you DON'T recognize. Recognize it? Use Clean up → Unsubscribe instead.\n")
+    addr, pw = ensure_creds(provider, interactive=True)
+    M = connect(provider, addr, pw, readonly=True)
+    print("\nConnected as %s.\nScanning your mailbox…\n" % addr)
+    dom = fetch_from(M, search_bulk(M, 0))   # all ages — a flagged sender is cleared fully
+    junk = [(d, c) for d, c in dom.most_common() if not _is_protected(d)]
+    M.logout()
+    if not junk:
+        print("No senders found to report."); return
+    CAP = 100
+    print("Senders (NOTHING is selected — pick only the ones to report):")
+    for i, (d, c) in enumerate(junk[:CAP], 1):
+        print("  %2d) %-34s %d" % (i, d, c))
+    pick = input("\nEnter numbers to REPORT as spam (e.g. 1,4,5), or press Enter to cancel: ").strip()
+    idx = {int(t) for t in pick.replace(" ", "").split(",") if t.isdigit()}
+    chosen = [junk[i - 1] for i in sorted(idx) if 1 <= i <= min(CAP, len(junk))]
+    if not chosen:
+        print("Nothing selected. Done."); return
+    doms = ",".join(d for d, _ in chosen)
+    cmd_spam(provider, addr, pw, doms, 0, yes=False)
+    if input("\nProceed and report these as spam for real? [y/N] ").strip().lower() == "y":
+        cmd_spam(provider, addr, pw, doms, 0, yes=True)
+
+
 def cmd_wizard(provider):
     print("\n== InboxSweeper (%s) ==" % provider)
     print("Safe by design: deleted mail goes to Trash (recoverable ~30 days).\n")
-    print("Cleaning mode:")
+    print("What would you like to do?")
+    print("  1) Clean up    — unsubscribe & move junk to Trash   (recommended)")
+    print("  2) Report spam — flag senders you don't recognize (trains your filter)")
+    if (input("Pick [1/2, default 1]: ").strip() or "1") == "2":
+        return _wizard_spam(provider)
+    print("\nCleaning mode:")
     print("  1) Sloth   — only mail older than 2 years  (safest)")
     print("  2) Normal  — mail older than 1 year         (recommended)")
     print("  3) MadMax  — ALL promo mail, incl. recent   (aggressive)")
@@ -606,6 +692,10 @@ def main():
     x = sub.add_parser("sweep", parents=[base])
     x.add_argument("--senders", help="comma-separated domains; omit to target all non-protected bulk senders")
     x.add_argument("--days", type=int, default=None, help="override the mode's age window"); x.add_argument("--yes", action="store_true")
+    x = sub.add_parser("spam", parents=[base], help="report specific senders as spam (deliberate; trains your filter)")
+    x.add_argument("--senders", required=True, help="comma-separated domains to report as spam")
+    x.add_argument("--days", type=int, default=0, help="age window (default: all ages)")
+    x.add_argument("--yes", action="store_true")
     x = sub.add_parser("unsub-run", parents=[base]); x.add_argument("--domains", required=True)
     x = sub.add_parser("block", parents=[base], help="delete a sender's mail + block them so future mail is auto-cleaned")
     x.add_argument("--senders", required=True); x.add_argument("--yes", action="store_true")
@@ -633,6 +723,9 @@ def main():
         addr, pw = ensure_creds(prov, interactive=False)
         days = a.days if a.days is not None else MODES[a.mode]
         cmd_sweep(prov, addr, pw, a.senders, days, a.yes); return
+    if a.cmd == "spam":
+        addr, pw = ensure_creds(prov, interactive=False)
+        cmd_spam(prov, addr, pw, a.senders, a.days, a.yes); return
     if a.cmd == "block":
         addr, pw = ensure_creds(prov, interactive=False)
         cmd_block(prov, addr, pw, a.senders, a.yes); return

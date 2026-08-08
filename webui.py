@@ -35,6 +35,12 @@ table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;
 .gh{font-size:13px;color:#8a94a6;text-decoration:none;border:1px solid #232a36;padding:6px 12px;border-radius:8px}
 .gh:hover{color:#e6e6e6;border-color:#3b82f6}
 .foot{margin:28px 0 8px;padding-top:18px;border-top:1px solid #232a36;text-align:center;color:#6b7280;font-size:12px;line-height:1.7}
+.tabs{display:flex;gap:4px;margin:4px 0 0}
+.tab{background:none;border:1px solid transparent;color:#8a94a6;padding:8px 16px;margin:0;border-radius:8px 8px 0 0;font-weight:600;cursor:pointer}
+.tab.active{color:#e6e6e6;background:#0f141c;border-color:#232a36;border-bottom-color:#0f141c}
+.tabpane{border:1px solid #232a36;border-radius:0 8px 8px 8px;padding:14px}
+button.amber{background:#d97706} button.amber:hover{background:#b45f04}
+.warn{color:#f5c451;background:#241a05;border:1px solid #4a3a0b;border-radius:8px;padding:11px 12px;margin:0 0 12px;font-size:13px}
 /* scanning animation */
 #scanner{position:relative;overflow:hidden;background:#080d15;border:1px solid #1b2431;border-radius:10px;
  padding:14px 16px;margin-top:12px;font:12.5px/1.7 ui-monospace,Menlo,monospace;color:#4ade80;min-height:132px}
@@ -74,17 +80,33 @@ table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;
   <div id=scanConsole></div>
  </div>
  <div id=results class=hide>
-  <table><thead><tr><th><input type=checkbox id=all onclick=toggleAll()></th><th>Sender</th><th>#</th><th>Unsubscribe</th><th></th></tr></thead>
-  <tbody id=rows></tbody></table>
-  <p class=hint style="margin-top:14px">Recommended order: <b>unsubscribe first</b>, then move to Trash — once mail is in the Trash its unsubscribe link can no longer be read.</p>
-  <button onclick=unsub()>1. Unsubscribe from selected</button>
-  <button class=danger onclick=sweep()>2. Move selected to Trash</button>
+  <div class=tabs>
+   <button class="tab active" id=tab-clean-btn onclick="showTab('clean')">🧹 Clean up</button>
+   <button class="tab" id=tab-spam-btn onclick="showTab('spam')">🚩 Report spam</button>
+  </div>
+
+  <div id=pane-clean class=tabpane>
+   <table><thead><tr><th><input type=checkbox id=all onclick=toggleAll()></th><th>Sender</th><th>#</th><th>Unsubscribe</th><th></th></tr></thead>
+   <tbody id=rows-clean></tbody></table>
+   <p class=hint style="margin-top:14px">Recommended order: <b>unsubscribe first</b>, then move to Trash — once mail is in the Trash its unsubscribe link can no longer be read.</p>
+   <button onclick=unsub()>1. Unsubscribe from selected</button>
+   <button class=danger onclick=sweep()>2. Move selected to Trash</button>
+  </div>
+
+  <div id=pane-spam class="tabpane hide">
+   <p class=warn>⚠ Reporting trains your spam filter, so a sender's future mail is auto-junked too. Only flag senders you <b>don't recognize</b>. Recognize it? Unsubscribe instead (Clean up tab).</p>
+   <table><thead><tr><th></th><th>Sender</th><th>#</th><th>Unsubscribe</th><th></th></tr></thead>
+   <tbody id=rows-spam></tbody></table>
+   <p class=hint>Nothing is pre-selected — tick only the senders you want to report.</p>
+   <button class=amber id=spamBtn onclick=reportSpam() disabled>Report 0 as spam</button>
+  </div>
  </div>
  <div id=log></div>
 </div>
 <footer class=foot>
  Made for people who want their inbox back. ·
- <a href="https://github.com/elixir-bash/inboxsweeper" target=_blank rel=noopener>GitHub</a> · MIT License<br>
+ <a href="https://github.com/elixir-bash/inboxsweeper" target=_blank rel=noopener>GitHub</a> ·
+ <a href="https://www.linkedin.com/in/gmukundan/" target=_blank rel=noopener>LinkedIn</a> · MIT License<br>
  Your mail stays yours — nothing here ever leaves your machine.
 </footer>
 <script>
@@ -111,15 +133,35 @@ function stopScan(){scanTimers.forEach(clearInterval);scanTimers=[];document.get
 async function scan(){scanmsg.textContent="";results.classList.add('hide');startScan();
  const r=await api('/api/scan',{provider:provider.value});stopScan();
  if(r.error){log("scan error: "+r.error);return}
- ROWS=r.senders;const tb=document.getElementById('rows');tb.innerHTML="";
- ROWS.forEach((s,i)=>{const tr=document.createElement('tr');
-  tr.innerHTML=`<td><input type=checkbox data-i=${i} ${s.protected?'':'checked'} ${s.protected?'disabled':''}></td>
-   <td>${s.domain}</td><td>${s.count}</td><td class=method>${s.method}</td>
-   <td>${s.protected?'<span class="tag p">protected</span>':'<span class="tag j">junk</span>'}</td>`;tb.appendChild(tr)});
+ ROWS=r.senders;
+ renderRows('rows-clean',true);   // Clean up: junk pre-checked (fast bulk)
+ renderRows('rows-spam',false);   // Report spam: nothing pre-checked (deliberate)
+ updateSpamBtn();showTab('clean');
  results.classList.remove('hide')}
-function selected(){return [...document.querySelectorAll('#rows input:checked')].map(c=>ROWS[c.dataset.i].domain)}
-function toggleAll(){document.querySelectorAll('#rows input:not([disabled])').forEach(c=>c.checked=all.checked)}
-function busy(b){document.querySelectorAll('#results button').forEach(x=>x.disabled=b)}
+function renderRows(tbodyId,preselect){const tb=document.getElementById(tbodyId);tb.innerHTML="";
+ const isSpam=tbodyId==='rows-spam';
+ ROWS.forEach((s,i)=>{const tr=document.createElement('tr');
+  const checked=(preselect && !s.protected)?'checked':'';
+  const onch=isSpam?'onchange=updateSpamBtn()':'';
+  tr.innerHTML=`<td><input type=checkbox data-i=${i} ${checked} ${s.protected?'disabled':''} ${onch}></td>
+   <td>${s.domain}</td><td>${s.count}</td><td class=method>${s.method}</td>
+   <td>${s.protected?'<span class="tag p">protected</span>':'<span class="tag j">junk</span>'}</td>`;tb.appendChild(tr)});}
+function selectedFrom(id){return [...document.querySelectorAll('#'+id+' input:checked')].map(c=>ROWS[c.dataset.i].domain)}
+function selected(){return selectedFrom('rows-clean')}
+function toggleAll(){document.querySelectorAll('#rows-clean input:not([disabled])').forEach(c=>c.checked=all.checked)}
+function showTab(n){document.getElementById('pane-clean').classList.toggle('hide',n!=='clean');
+ document.getElementById('pane-spam').classList.toggle('hide',n!=='spam');
+ document.getElementById('tab-clean-btn').classList.toggle('active',n==='clean');
+ document.getElementById('tab-spam-btn').classList.toggle('active',n==='spam');}
+function updateSpamBtn(){const n=selectedFrom('rows-spam').length,b=document.getElementById('spamBtn');
+ b.textContent="Report "+n+" as spam";b.disabled=(n===0);}
+function busy(b){document.querySelectorAll('.tabpane button').forEach(x=>x.disabled=b);if(!b)updateSpamBtn();}
+async function reportSpam(){const d=selectedFrom('rows-spam');if(!d.length)return;
+ if(!confirm("Report "+d.length+" sender(s) as SPAM?\\n\\nThis trains your spam filter and should only be used for senders you don't recognize."))return;
+ busy(true);log("Reporting "+d.length+" sender(s) as spam…");
+ const r=await api('/api/spam',{provider:provider.value,domains:d});busy(false);
+ if(r.error){log("error: "+r.error);return}
+ log("\\u2713 Done. Reported "+r.moved+" messages as spam — their future mail will be auto-junked.")}
 async function sweep(){const d=selected();if(!d.length)return log("nothing selected");
  busy(true);log("Previewing "+d.length+" senders…");const p=await api('/api/sweep',{provider:provider.value,domains:d,execute:false});busy(false);
  if(p.error){log("error: "+p.error);return}
@@ -217,6 +259,16 @@ class H(BaseHTTPRequestHandler):
                 moved += E.move_to_trash(M, uids)
             M.logout()
             E.track("sweep", prov, emails=moved, size_bytes=freed)
+            return {"moved": moved}
+        if path == "/api/spam":
+            domains = [d for d in req["domains"] if not E._is_protected(d)]
+            if not domains:
+                return {"moved": 0}
+            M = E.connect(prov, addr, pw, readonly=False); moved = 0
+            for d in domains:
+                moved += E.move_to_spam(M, E.search_sender(M, d, 0))   # all ages
+            M.logout()
+            E.track("spam", prov, emails=moved)
             return {"moved": moved}
         if path == "/api/unsub":
             M = E.connect(prov, addr, pw, readonly=True); box = [None]; res = []; ok = 0
