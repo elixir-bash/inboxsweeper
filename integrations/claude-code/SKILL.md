@@ -1,9 +1,9 @@
 ---
 name: inboxsweeper
-description: Clean up and unsubscribe from a personal Gmail over IMAP using an app password (macOS Keychain or env vars). Bulk-delete promotional/newsletter mail to Bin (30-day recovery, never permanent), profile noisy senders, and unsubscribe via RFC-8058 one-click or mailto. Use when the user wants to declutter Gmail, mass-delete promotions/updates, stop newsletters, or unsubscribe from mailing lists. Trigger words - gmail cleanup, declutter inbox, delete promotions, mass delete email, unsubscribe, newsletters, inbox zero.
+description: Clean up, unsubscribe from, and report spam in a personal Gmail or Yahoo/IMAP mailbox using an app password (macOS Keychain or env vars). Bulk-delete promotional/newsletter mail to Trash (30-day recovery, never permanent), profile noisy senders, unsubscribe via RFC-8058 one-click or mailto, and report unrecognized senders as spam (trains the filter). Runs 100% locally; nothing is uploaded. Use when the user wants to declutter Gmail/Yahoo, mass-delete promotions/updates, stop newsletters, unsubscribe from mailing lists, or flag spam. Trigger words - gmail cleanup, yahoo cleanup, declutter inbox, delete promotions, mass delete email, unsubscribe, report spam, newsletters, inbox zero.
 ---
 
-# Gmail Declutter (skill)
+# InboxSweeper (skill)
 
 Runs the `inboxsweeper.py` CLI co-located in this skill folder. **Follow the safety rules below
 before any delete, unsubscribe, or spam report** — the tool also auto-shields financial/security/
