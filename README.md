@@ -274,18 +274,20 @@ can use.
   - **mailto** → sends an unsubscribe email via SMTP using your app password.
   - **weblink-only** → reported for manual handling (never auto-clicked; could be a tracker).
 
-## Claude Code / Codex
+## AI coding agents (Claude Code, Codex, Jules, Cursor…)
 
-This repo ships ready-made instructions so an AI coding agent can drive the tool for you.
+This repo ships ready-made instructions so an AI coding agent can drive the tool for you. See
+[`integrations/`](integrations/) for the full map — in short:
 
-- **Claude Code** — install as a skill (bundles the script + ruleset so it's self-contained):
+- **Claude Code** — install as a skill (bundles the script so it's self-contained):
   ```bash
   mkdir -p ~/.claude/skills/inboxsweeper
-  cp integrations/claude-code/SKILL.md inboxsweeper.py the built-in safety rules ~/.claude/skills/inboxsweeper/
+  cp integrations/claude-code/SKILL.md inboxsweeper.py ~/.claude/skills/inboxsweeper/
   ```
-  Then just ask Claude: *"declutter my gmail"* / *"unsubscribe from these senders"*.
-- **Codex / other agents** — point the agent at [`AGENTS.md`](AGENTS.md) (or drop it at your
-  repo root). It documents the commands, the safety rules, and the recommended flow.
+  Then just ask Claude: *"declutter my gmail"* / *"unsubscribe from these senders"* / *"report these as spam"*.
+- **Codex, Jules, Cursor, Gemini CLI & other agents** — they all read [`AGENTS.md`](AGENTS.md)
+  automatically. Drop `inboxsweeper.py` + `AGENTS.md` in your project (or run the agent from this
+  repo) and just ask. It documents the commands, the safety rules, and the recommended flow.
 
 ## FAQ
 

@@ -5,8 +5,9 @@ description: Clean up and unsubscribe from a personal Gmail over IMAP using an a
 
 # Gmail Declutter (skill)
 
-Runs the `inboxsweeper.py` CLI co-located in this skill folder. **Read the built-in safety rules (same
-folder) before any delete or unsubscribe.**
+Runs the `inboxsweeper.py` CLI co-located in this skill folder. **Follow the safety rules below
+before any delete, unsubscribe, or spam report** — the tool also auto-shields financial/security/
+government senders so they can never be touched.
 
 ## Setup (one time)
 1. Gmail account with 2-Step Verification ON → create an app password at
@@ -20,20 +21,22 @@ folder) before any delete or unsubscribe.**
 
 ## Commands
 ```
+python3 inboxsweeper.py wizard                              # guided: Clean up OR Report spam
 python3 inboxsweeper.py counts
-python3 inboxsweeper.py profile   --top 40
+python3 inboxsweeper.py profile    --top 40
 python3 inboxsweeper.py unsub-list --top 40
-python3 inboxsweeper.py sweep     --query "<gmail query>"          # DRY RUN
-python3 inboxsweeper.py sweep     --query "<gmail query>" --yes    # → Bin
+python3 inboxsweeper.py sweep     --senders "a.com,b.com"          # DRY RUN
+python3 inboxsweeper.py sweep     --senders "a.com,b.com" --yes    # → Trash
 python3 inboxsweeper.py unsub-run --domains "a.com,b.com"
+python3 inboxsweeper.py spam      --senders "x.com" --yes          # report unrecognized as spam
 ```
+Add `--provider yahoo` for Yahoo, and `--mode sloth|normal|madmax` to set how far back to reach.
 
 ## How to operate (follow the built-in safety rules)
 1. `counts` → find the mass. `profile` → rank senders.
-2. Classify senders PROTECT / DELETE / KEEP-BY-DEFAULT; confirm the DELETE set with the user.
-3. `sweep` dry-run → show count → `--yes` to move to Bin (reversible). Verify a sample.
-4. `unsub-list` → `unsub-run` recognized senders (one-click/mailto only).
-5. Suspected spam / unrecognized → tell the user to **report spam**, do NOT unsubscribe.
-6. Never permanent-delete. Never auto-click a `weblink` unsubscribe. Protect financial /
-   security / government / transactional / personal / work senders.
-7. Long runs: background them; surface a summary, not raw logs.
+2. Classify senders PROTECT / UNSUBSCRIBE / TRASH / REPORT-SPAM; confirm the sets with the user.
+3. Recognized senders: `unsub-run` first, then `sweep` dry-run → `--yes` to move to Trash. Verify a sample.
+4. Unrecognized / suspected spam → `spam --senders …` (dry-run → `--yes`); do NOT unsubscribe.
+5. Never permanent-delete. Never auto-click a `weblink` unsubscribe. Protect financial /
+   security / government / transactional / personal / work senders (shielded automatically).
+6. Long runs: background them; surface a summary, not raw logs.
