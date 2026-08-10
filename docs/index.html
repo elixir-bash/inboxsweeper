@@ -216,6 +216,21 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
   <p class="muted" style="margin-top:14px;font-size:13px">Comparison reflects public product info; the point isn't feature-parity with mature paid suites — it's the same everyday cleanup, kept private and free.</p>
 </section>
 
+<section id="different">
+  <h2>How this one is different</h2>
+  <p class="muted">There are a lot of "inbox" cleaners — browser extensions, Gmail-only add-ons, cloud
+   services. Most ask you to <em>sign in with Google</em> and hand a company ongoing access to your
+   mailbox. This one is built the opposite way.</p>
+  <div class="grid">
+    <div class="feat"><h4>No "Sign in with Google", no OAuth</h4><p>There's no consent screen granting a third party access to your account. You create a Gmail <b>app password</b> and paste it once — it lives in your OS keychain, on your machine. Revoke it anytime and the tool dies instantly.</p></div>
+    <div class="feat"><h4>Not a browser extension</h4><p>Nothing installs into your browser. Extensions can change hands or silently update what they do; this is open-source code you run yourself and can read line by line.</p></div>
+    <div class="feat"><h4>Nothing is uploaded — not even a token</h4><p>Your mail, credentials and tokens never leave your computer. No cloud inbox copy, no server holding your access. The only thing sent is an anonymous, opt-out sweep counter (counts + app version, never addresses or content).</p></div>
+    <div class="feat"><h4>Works beyond Gmail</h4><p>Gmail is fully supported, plus experimental Yahoo and any IMAP inbox — not locked to a single provider.</p></div>
+    <div class="feat"><h4>Focused, not bloated</h4><p>It does the three things that matter — clean by sender, real unsubscribe, deliberate report-spam — and stops there. No gimmicks bolted on.</p></div>
+    <div class="feat"><h4>Free, forever, open source</h4><p>MIT-licensed, no signup, no OTP, no phone number, no subscription. If it ever isn't enough, fork it.</p></div>
+  </div>
+</section>
+
 <section id="start">
   <h2>Get started — four ways</h2>
   <p class="muted">Pick whichever fits you. All four run 100% on your own machine.</p>

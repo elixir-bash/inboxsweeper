@@ -16,6 +16,19 @@ anywhere. Deleted mail goes to Trash, so you can always get it back.
 
 **⬇️ Get it:** [Download the app (ZIP)](https://github.com/elixir-bash/inboxsweeper/archive/refs/heads/main.zip) then double-click the launcher inside · or the one-file [Windows .exe](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe) — or scroll to [the terminal](#the-terminal-for-coders) / [Claude & Codex](#claude-code--codex) options.
 
+### How this is different from other "inbox" cleaners
+
+There are a lot of inbox tools — browser extensions, Gmail-only add-ons, cloud services. Most ask
+you to **"Sign in with Google"** and hand a company ongoing access to your mailbox. InboxSweeper is
+built the opposite way:
+
+- **No OAuth / no "Sign in with Google".** You paste a scoped **app password** once (stored in your OS keychain), never grant a third party access to your account. Revoke it anytime and the tool stops instantly.
+- **Not a browser extension.** Nothing installs into your browser; it's open-source code you run yourself and can read line by line. No extension that can change hands or silently update what it does.
+- **Nothing is uploaded — not even a token.** Your mail, credentials and tokens never leave your machine. No cloud copy of your inbox, no server holding your access. (The only thing sent is an anonymous, opt-out sweep counter — counts + version, never addresses or content.)
+- **Works beyond Gmail.** Gmail fully supported, plus experimental Yahoo and any IMAP inbox — not locked to one provider.
+- **Focused, not bloated.** Clean by sender, real one-click unsubscribe, deliberate report-spam — and nothing gimmicky bolted on.
+- **Free and open source, no strings.** MIT, no signup, no OTP, no phone number, no subscription.
+
 > ⚠️ **Read the built-in safety rules before you run a sweep.** The one rule that matters
 > most: **recognize a sender → unsubscribe; don't recognize it → report spam, never
 > unsubscribe.** Clicking unsubscribe on real spam confirms your address is live and gets
@@ -299,6 +312,13 @@ The tool never permanently deletes and never clicks arbitrary web links.
 
 **Does it work with non-Gmail IMAP?** It's built for Gmail (uses `X-GM-RAW` and Gmail
 categories). Other providers need query changes.
+
+**Is this the Chrome extension / Gmail add-on that asks to sign in with Google?** No — different
+project. This one has no OAuth and no browser extension. You use an app password over IMAP, entirely
+on your own machine, and it's open source so you can read exactly what it does before you run it.
+
+**Do I have to grant Google account access?** No. You paste a scoped app password once; you never
+click through a "Sign in with Google" consent screen handing anyone access to your account.
 
 ## Anonymous usage stats
 
