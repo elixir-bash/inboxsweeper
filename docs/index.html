@@ -120,7 +120,45 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
     <a class="btn ghost" href="https://github.com/elixir-bash/inboxsweeper">GitHub</a>
   </div>
   <p class="muted" style="font-size:13px;margin-top:10px">Free &amp; open. Unzip → double-click <span class="mono">InboxSweeper.command</span> (Mac) or <span class="mono">InboxSweeper.bat</span> (Windows). Opens in your browser. <b>Windows without Python?</b> Grab the one-file <span class="mono">.exe</span>.</p>
+  <p class="muted" style="font-size:13px;margin-top:6px">⚠️ <b>First time?</b> Your browser or OS will probably warn you — the app is unsigned.
+  <a href="#firstrun">Here's exactly what you'll see and what to click →</a></p>
 </header>
+
+<section id="firstrun" style="margin-top:34px">
+  <h2>First run: what your computer will say</h2>
+  <p class="muted">InboxSweeper isn't code-signed — a signing certificate costs $99/year and this is free,
+  so your browser and OS will treat it as an unknown app. Nothing is wrong; here's each screen and the
+  one button that gets past it. You can read every line of the source first if you'd rather.</p>
+
+  <div class="grid" style="margin-top:18px">
+    <div class="feat"><h4>🪟 Windows — the download itself is blocked</h4>
+      <p>Chrome or Edge may say <em>"InboxSweeper.exe isn't commonly downloaded"</em> or
+      <em>"can't be downloaded securely"</em> and hide the file.</p>
+      <p><b>Do this:</b> open the browser's Downloads bar or the <span class="mono">⋮</span> next to the file →
+      <b>Keep</b> → <b>Keep anyway</b>. The download then completes normally.</p></div>
+
+    <div class="feat"><h4>🪟 Windows — SmartScreen on first launch</h4>
+      <p>A blue box: <em>"Windows protected your PC"</em>.</p>
+      <p><b>Do this:</b> click <b>More info</b> → <b>Run anyway</b>. The button only appears after you click
+      More info, which is why it's easy to miss.</p></div>
+
+    <div class="feat"><h4>🍎 Mac — "unidentified developer"</h4>
+      <p>Double-clicking <span class="mono">InboxSweeper.command</span> gives
+      <em>"cannot be opened because it is from an unidentified developer"</em>, or on newer macOS
+      <em>"Apple could not verify it is free of malware"</em>.</p>
+      <p><b>Do this:</b> <b>right-click</b> (or Control-click) the file → <b>Open</b> → <b>Open</b> in the dialog.
+      You only do this once. A plain double-click will keep failing — the right-click route is what tells
+      macOS you trust it.</p></div>
+
+    <div class="feat"><h4>🍎 Mac — still stuck?</h4>
+      <p>If macOS refuses even after right-click → Open, clear the download quarantine flag. Open Terminal, paste:</p>
+      <p><span class="mono">xattr -d com.apple.quarantine ~/Downloads/inboxsweeper-main/InboxSweeper.command</span></p>
+      <p>Then double-click as normal. (Adjust the path if you unzipped somewhere else.)</p></div>
+  </div>
+
+  <p class="muted" style="margin-top:14px">Still stuck? <a href="https://github.com/elixir-bash/inboxsweeper/issues">Tell me what you saw</a>
+  — which OS, which browser, and the exact wording — and I'll fix it.</p>
+</section>
 
 <div class="pillars">
   <div class="pillar"><div class="ic">🔒</div><h3>Truly private</h3><p>Runs 100% locally over IMAP with an app password. Your email never touches a third-party server. Ever.</p></div>
@@ -239,10 +277,12 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
     <div class="feat"><h4>🖱️ Web app <span class="muted" style="font-size:12px">· recommended</span></h4>
       <p>Download the app (green <b>Code → Download ZIP</b> on GitHub), unzip, and double-click
       <span class="mono">InboxSweeper.command</span> (Mac) or <span class="mono">InboxSweeper.bat</span>
-      (Windows). It opens in your browser. No Python? The launcher walks you through the free one-time install.</p></div>
+      (Windows). It opens in your browser. No Python? The launcher walks you through the free one-time install.
+      <b>On Mac, right-click → Open the first time</b> (<a href="#firstrun">why</a>).</p></div>
     <div class="feat"><h4>📦 Windows .exe</h4>
       <p>Want zero setup on Windows? Download the one-file <span class="mono">InboxSweeper.exe</span>,
-      double-click, done — nothing else to install. (SmartScreen → <em>More info → Run anyway</em>.)</p></div>
+      double-click, done — nothing else to install. Your browser and SmartScreen will both warn you first —
+      <a href="#firstrun">here's what to click</a>.</p></div>
     <div class="feat"><h4>⌨️ Terminal</h4>
       <p>For coders — two lines and you're cleaning.</p></div>
     <div class="feat"><h4>🤖 AI coding agents</h4>

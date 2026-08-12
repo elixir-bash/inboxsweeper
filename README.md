@@ -117,8 +117,33 @@ senders, and hit **Move to Trash** or **Unsubscribe**. Nothing is uploaded; dele
 Prefer a true one-file download with **no Python step at all**? On Windows:
 
 1. Download **[InboxSweeper.exe](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe)**.
+   Chrome/Edge may block the download itself (*"isn't commonly downloaded"*) → open the Downloads bar,
+   click the **⋮** next to the file → **Keep** → **Keep anyway**.
 2. Double-click it. Windows SmartScreen may warn (free/unsigned) → click **More info → Run anyway**.
 3. It opens in your **web browser** — pick Gmail or Yahoo and follow the on-screen steps.
+
+---
+
+## 🚧 First run: what your computer will say
+
+InboxSweeper isn't code-signed — a certificate costs $99/year and this is free — so your browser and OS
+treat it as an unknown app. Nothing is wrong. Each wall and the one button past it:
+
+| What you see | Where | What to click |
+|---|---|---|
+| *"isn't commonly downloaded" / "can't be downloaded securely"* | Chrome/Edge, during download | Downloads bar → **⋮** → **Keep** → **Keep anyway** |
+| *"Windows protected your PC"* | Windows, first launch | **More info** → **Run anyway** |
+| *"unidentified developer"* / *"Apple could not verify…"* | Mac, first launch | **Right-click** (or Control-click) `InboxSweeper.command` → **Open** → **Open** |
+
+**Mac note:** a plain double-click will keep failing. The right-click → Open route is what tells macOS you
+trust it, and you only do it once. If it still refuses, clear the download quarantine flag:
+
+```bash
+xattr -d com.apple.quarantine ~/Downloads/inboxsweeper-main/InboxSweeper.command
+```
+
+Hit something not listed here? [Open an issue](https://github.com/elixir-bash/inboxsweeper/issues) with your
+OS, browser and the exact wording — that's the fastest way to get it fixed.
 
 ---
 
