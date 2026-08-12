@@ -108,25 +108,61 @@ and on a Mac the honest answer isn't the one you'd expect, so it's spelled out b
 
 Or skip Python entirely with the [one-file `.exe`](#-windows-exe-nothing-else-to-install).
 
-### 🍎 Mac — one line, then the same app
+### 🍎 Mac — copy two lines, once
 
-Apple blocks unsigned downloads, and since macOS 15 the click-through to allow them is unreliable for
-launcher files like ours. Removing that wall properly costs $99/year for an Apple Developer ID, which
-this project doesn't have. **So on a Mac, the shortest reliable route is one line in Terminal** — and
-it skips the download and the warnings completely:
+**Why there's a step at all:** Macs refuse to open apps unless the maker pays Apple $99 a year.
+This one is free and doesn't. So instead of fighting that, you install it a different way —
+it takes about a minute, and you never see a warning.
 
-```bash
-pip3 install inboxsweeper     # once
-inboxsweeper serve            # opens the same web app in your browser
+You'll use an app called **Terminal**. Don't worry about what it is; you're pasting two lines.
+
+**Step 1 — Open Terminal.**
+Hold **⌘ (Command)** and press **Space**. A search box appears in the middle of your screen.
+Type `Terminal` and press **Return**. A plain window opens with some text and a blinking cursor.
+
+**Step 2 — Install it.** Copy this line, paste it into that window, press **Return**:
+
+```
+pip3 install inboxsweeper
 ```
 
-That's it — `serve` gives you the identical point-and-click interface. (Press ⌘+Space, type
-"Terminal", hit Return to get a terminal.)
+Text will scroll past for 20–30 seconds. That's normal. Wait until the blinking cursor comes back.
 
-Prefer not to use Terminal at all? Download the ZIP and double-click **`InboxSweeper.command`** —
-it works *if* macOS lets you approve it; [here's how to try](#-first-run-what-your-computer-will-say).
-If Apple's approval button doesn't appear for you, that's the limitation above, not something you
-did wrong — use the one-liner instead.
+> Says `command not found`? Your Mac needs Python first — it's free and takes 2 minutes:
+> download it from [python.org/downloads](https://www.python.org/downloads/macos/), open the file,
+> click **Continue → Install**, then come back and repeat Step 2.
+
+**Step 3 — Start it.** Copy this line, paste it, press **Return**:
+
+```
+inboxsweeper serve
+```
+
+**Your web browser opens with InboxSweeper in it.** That's the whole thing — from here it's all
+clicking. Leave the Terminal window open while you use it; closing it stops the app.
+
+**Every time after this,** you only do Steps 1 and 3. It's already installed.
+
+<details><summary>I already downloaded the ZIP and want to use that instead</summary>
+
+Double-clicking `InboxSweeper.command` will show *"Apple could not verify…"* — that's the wall
+described above. To clear it, open Terminal (Step 1) and paste this, then press **Return**:
+
+```
+xattr -d com.apple.quarantine ~/Downloads/inboxsweeper-main/InboxSweeper.command
+```
+
+Now double-click `InboxSweeper.command` in Finder and it opens normally, every time.
+
+If you get `No such file or directory`, your folder is somewhere else: type `xattr -d
+com.apple.quarantine ` (with a space at the end), then **drag the `InboxSweeper.command` file from
+Finder into the Terminal window** — it fills in the correct path for you — then press Return.
+
+You may also see advice to right-click → Open, or to use System Settings → Privacy & Security →
+Open Anyway. Apple removed the first in macOS 15, and the second is built for `.app` bundles and
+often shows no button for files like this one. If it doesn't work for you, nothing is broken —
+use the command above.
+</details>
 
 ### 🐧 Linux
 

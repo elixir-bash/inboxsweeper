@@ -81,6 +81,10 @@ h2{font-size:30px;letter-spacing:-.5px;margin:0 0 8px}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px}
 .feat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
 .feat h4{margin:0 0 6px;font-size:16px} .feat p{margin:0;color:var(--dim);font-size:14px}
+.feat p+p{margin-top:10px}
+.warn{color:#f5c451;background:#241a05;border:1px solid #4a3a0b;border-radius:8px;padding:11px 12px;font-size:13.5px}
+.feat p.warn{color:#f5c451}
+.hint{font-size:13px;opacity:.85}
 .steps{counter-reset:s;display:grid;gap:14px;margin-top:24px}
 .step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px 18px 62px;position:relative}
 .step::before{counter-increment:s;content:counter(s);position:absolute;left:18px;top:16px;width:30px;height:30px;border-radius:50%;background:var(--acc);color:#fff;font-weight:700;display:grid;place-items:center}
@@ -150,6 +154,15 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
       $99/year certificate would tell you, for free. Needs the
       <a href="https://cli.github.com">GitHub CLI</a>.</p></div>
 
+    <div class="feat"><h4>🍎 Mac — the command that actually works</h4>
+      <p>If you downloaded the ZIP: open <b>Terminal</b> (hold ⌘, press Space, type
+      <span class="mono">Terminal</span>, Return), paste this, press Return:</p>
+      <p><span class="mono">xattr -d com.apple.quarantine ~/Downloads/inboxsweeper-main/InboxSweeper.command</span></p>
+      <p>Then double-click <span class="mono">InboxSweeper.command</span> in Finder — it opens normally,
+      now and every time after.</p>
+      <p class="hint">Got <em>"No such file or directory"</em>? Your folder is elsewhere. Type
+      <span class="mono">xattr -d com.apple.quarantine </span> with a trailing space, then <b>drag the file
+      from Finder into the Terminal window</b> — it fills in the path — and press Return.</p></div>
     <div class="feat"><h4>🍎 Mac — "unidentified developer"</h4>
       <p>Double-clicking <span class="mono">InboxSweeper.command</span> gives
       <em>"cannot be opened because it is from an unidentified developer"</em>, or on newer macOS
@@ -172,11 +185,6 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
       after the blocked attempt. If the button isn't there, just double-click the launcher again to bring it back.</p>
       <p><b>On macOS 14 and older:</b> right-click (or Control-click) the file → <b>Open</b> → <b>Open</b>.</p></div>
 
-    <div class="feat"><h4>🍎 Mac — the one-line shortcut</h4>
-      <p>Comfortable in Terminal? This clears the "downloaded from the internet" flag on any macOS
-      version, and then it just opens:</p>
-      <p><span class="mono">xattr -d com.apple.quarantine ~/Downloads/inboxsweeper-main/InboxSweeper.command</span></p>
-      <p>Adjust the path if you unzipped somewhere else. Nothing else to undo afterwards.</p></div>
   </div>
 
   <p class="muted" style="margin-top:14px">Still stuck? <a href="https://github.com/elixir-bash/inboxsweeper/issues">Tell me what you saw</a>
@@ -302,12 +310,14 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
       <p>Download the app (green <b>Code → Download ZIP</b> on GitHub), unzip, and double-click
       <span class="mono">InboxSweeper.bat</span>. It opens in your browser. No Python? The launcher walks
       you through the free one-time install. Windows warns once — <a href="#firstrun">what to click</a>.</p></div>
-    <div class="feat"><h4>🍎 Web app · Mac <span class="muted" style="font-size:12px">· one line</span></h4>
-      <p>Apple blocks unsigned downloads, and since macOS 15 the click-through to allow them is unreliable
-      for launcher files. So on a Mac the shortest reliable route skips the download entirely:</p>
-      <p><span class="mono">pip3 install inboxsweeper</span><br><span class="mono">inboxsweeper serve</span></p>
-      <p>Same point-and-click app in your browser, no warnings to clear. Rather not use Terminal?
-      The ZIP launcher still works if macOS lets you approve it — <a href="#firstrun">how to try</a>.</p></div>
+    <div class="feat"><h4>🍎 Web app · Mac <span class="muted" style="font-size:12px">· two lines, once</span></h4>
+      <p>Macs refuse to open apps unless the maker pays Apple $99/year. This one is free and doesn't —
+      so you install it a different way and never see a warning. About a minute:</p>
+      <p><b>1.</b> Hold <b>⌘</b> and press <b>Space</b>, type <span class="mono">Terminal</span>, press Return.<br>
+      <b>2.</b> Paste <span class="mono">pip3 install inboxsweeper</span> → Return. Wait ~30s.<br>
+      <b>3.</b> Paste <span class="mono">inboxsweeper serve</span> → Return.</p>
+      <p>Your browser opens with InboxSweeper in it — all clicking from there. Next time, just steps 1 and 3.
+      Downloaded the ZIP instead? <a href="#firstrun">One command clears the warning</a>.</p></div>
     <div class="feat"><h4>📦 Windows .exe</h4>
       <p>Want zero setup on Windows? Download the one-file <span class="mono">InboxSweeper.exe</span>,
       double-click, done — nothing else to install. Your browser and SmartScreen will both warn you first —
@@ -379,12 +389,6 @@ inboxsweeper wizard      # or the guided terminal version</code>
     <p class="muted" style="font-size:13px;margin-top:12px">Prefer GitHub?
       <a href="https://github.com/elixir-bash/inboxsweeper/discussions/new?category=q-a" target="_blank">Ask a question</a> ·
       <a href="https://github.com/elixir-bash/inboxsweeper/issues/new?labels=feedback&template=&title=Feedback:%20" target="_blank">Open an issue</a>
-    </p>
-  </div>
-  <div class="feat" style="margin-top:18px">
-    <div class="giscus"></div>
-    <p class="muted" id="giscus-fallback" style="font-size:13px;margin-top:10px">
-      Loading comments… If this stays empty, the maintainer just needs to finish a one-time setup.
     </p>
   </div>
 </section>
