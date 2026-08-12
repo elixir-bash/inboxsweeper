@@ -95,17 +95,42 @@ Pick the one that fits you:
 
 ## 🖱️ The web app (for everyone)
 
-Works on **Mac, Windows, and Linux**, always runs the latest version — nothing to compile.
+The same point-and-click interface on every platform. **How you start it differs by computer** —
+and on a Mac the honest answer isn't the one you'd expect, so it's spelled out below.
+
+### 🪟 Windows — double-click, nothing else
 
 1. **Download the app:** on the [GitHub page](https://github.com/elixir-bash/inboxsweeper), click the
-   green **Code** button → **Download ZIP** *(or use this [direct link](https://github.com/elixir-bash/inboxsweeper/archive/refs/heads/main.zip))*.
-2. **Unzip it** — double-click on Mac; right-click → *Extract All* on Windows.
-3. Open the unzipped folder and **double-click the launcher for your computer:**
-   - **🍎 macOS →** `InboxSweeper.command`
-     *(first time only, macOS will block it once — [here's the one-time unlock](#-first-run-what-your-computer-will-say).)*
-   - **🪟 Windows →** `InboxSweeper.bat`
-   - **🐧 Linux →** `InboxSweeper.command` (or run `python3 inboxsweeper.py serve`)
-4. A small window opens and **InboxSweeper appears in your web browser.** Keep that window open while you use it.
+   green **Code** button → **Download ZIP** *(or the [direct link](https://github.com/elixir-bash/inboxsweeper/archive/refs/heads/main.zip))*.
+2. **Unzip it** — right-click → *Extract All*.
+3. Double-click **`InboxSweeper.bat`**. Windows may warn once ([what to click](#-first-run-what-your-computer-will-say)).
+4. A small window opens and **InboxSweeper appears in your browser.** Keep it open while you use it.
+
+Or skip Python entirely with the [one-file `.exe`](#-windows-exe-nothing-else-to-install).
+
+### 🍎 Mac — one line, then the same app
+
+Apple blocks unsigned downloads, and since macOS 15 the click-through to allow them is unreliable for
+launcher files like ours. Removing that wall properly costs $99/year for an Apple Developer ID, which
+this project doesn't have. **So on a Mac, the shortest reliable route is one line in Terminal** — and
+it skips the download and the warnings completely:
+
+```bash
+pip3 install inboxsweeper     # once
+inboxsweeper serve            # opens the same web app in your browser
+```
+
+That's it — `serve` gives you the identical point-and-click interface. (Press ⌘+Space, type
+"Terminal", hit Return to get a terminal.)
+
+Prefer not to use Terminal at all? Download the ZIP and double-click **`InboxSweeper.command`** —
+it works *if* macOS lets you approve it; [here's how to try](#-first-run-what-your-computer-will-say).
+If Apple's approval button doesn't appear for you, that's the limitation above, not something you
+did wrong — use the one-liner instead.
+
+### 🐧 Linux
+
+`pip install inboxsweeper && inboxsweeper serve`, or double-click `InboxSweeper.command` from the ZIP.
 
 It installs its one dependency automatically. **Don't have Python?** The launcher opens the download
 page and walks you through the free, one-time install — then just double-click again. From there it's
@@ -145,9 +170,20 @@ treat it as an unknown app. Nothing is wrong. Each wall and the one button past 
 | *"Windows protected your PC"* | Windows, first launch | **More info** → **Run anyway** |
 | *"Apple could not verify…"* / *"unidentified developer"* | Mac, first launch | Click **Done**, then **System Settings → Privacy & Security → Open Anyway** |
 
-**Mac note — this changed in macOS 15.** The old advice you'll find everywhere (right-click → Open) was
-removed by Apple in Sequoia. On macOS 15 and newer, including macOS 26, follow
-[Apple's own steps](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac):
+**Mac — read this first.** If you're willing to paste one line, skip all of it:
+
+```bash
+pip3 install inboxsweeper && inboxsweeper serve
+```
+
+A pip install carries no "downloaded from the internet" flag, so Gatekeeper never gets involved —
+no warnings, no Settings, no approval. Everything below is only for people who'd rather not.
+
+**The click-through route, and its catch.** The old advice (right-click → Open) was removed by Apple
+in macOS 15. The replacement is [Apple's documented flow](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac) —
+but be warned it's designed for `.app` bundles and is **unreliable for launcher files like ours**;
+the approval button often doesn't appear at all. If that happens to you, nothing is wrong with your
+Mac — use the one-liner above:
 
 1. **Double-click `InboxSweeper.command`.** macOS blocks it. Click **Done** — *not* **Move to Trash**,
    which deletes the launcher.

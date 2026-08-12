@@ -154,9 +154,14 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
       <p>Double-clicking <span class="mono">InboxSweeper.command</span> gives
       <em>"cannot be opened because it is from an unidentified developer"</em>, or on newer macOS
       <em>"Apple could not verify it is free of malware"</em>.</p>
+      <p class="warn">🍎 <b>Skip all of this with one line:</b> <span class="mono">pip3 install inboxsweeper</span>
+      then <span class="mono">inboxsweeper serve</span>. A pip install carries no download flag, so Gatekeeper
+      never gets involved — and you get the same browser app.</p>
       <p><b>On macOS 15 Sequoia and newer</b> (including macOS 26) — Apple removed the old
       right-click → Open trick, so ignore that advice wherever you find it. These are
-      <a href="https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac">Apple's own steps</a>:</p>
+      <a href="https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac">Apple's own steps</a>,
+      but they're built for <span class="mono">.app</span> bundles and are <b>unreliable for launcher files
+      like ours</b> — the approval button often doesn't appear. If that's you, nothing is broken; use the line above.</p>
       <p><b>1.</b> Double-click <span class="mono">InboxSweeper.command</span> → click <b>Done</b>.
       <em>Not</em> Move to Trash, which deletes it.<br>
       <b>2.</b> <b> menu → System Settings → Privacy &amp; Security</b>, scroll to <b>Security</b>.<br>
@@ -293,11 +298,16 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
   <p class="muted">Pick whichever fits you. All four run 100% on your own machine.</p>
 
   <div class="grid" style="margin-top:22px">
-    <div class="feat"><h4>🖱️ Web app <span class="muted" style="font-size:12px">· recommended</span></h4>
+    <div class="feat"><h4>🖱️ Web app · Windows <span class="muted" style="font-size:12px">· recommended</span></h4>
       <p>Download the app (green <b>Code → Download ZIP</b> on GitHub), unzip, and double-click
-      <span class="mono">InboxSweeper.command</span> (Mac) or <span class="mono">InboxSweeper.bat</span>
-      (Windows). It opens in your browser. No Python? The launcher walks you through the free one-time install.
-      <b>Mac blocks it once on first launch</b> — <a href="#firstrun">the one-time unlock</a>.</p></div>
+      <span class="mono">InboxSweeper.bat</span>. It opens in your browser. No Python? The launcher walks
+      you through the free one-time install. Windows warns once — <a href="#firstrun">what to click</a>.</p></div>
+    <div class="feat"><h4>🍎 Web app · Mac <span class="muted" style="font-size:12px">· one line</span></h4>
+      <p>Apple blocks unsigned downloads, and since macOS 15 the click-through to allow them is unreliable
+      for launcher files. So on a Mac the shortest reliable route skips the download entirely:</p>
+      <p><span class="mono">pip3 install inboxsweeper</span><br><span class="mono">inboxsweeper serve</span></p>
+      <p>Same point-and-click app in your browser, no warnings to clear. Rather not use Terminal?
+      The ZIP launcher still works if macOS lets you approve it — <a href="#firstrun">how to try</a>.</p></div>
     <div class="feat"><h4>📦 Windows .exe</h4>
       <p>Want zero setup on Windows? Download the one-file <span class="mono">InboxSweeper.exe</span>,
       double-click, done — nothing else to install. Your browser and SmartScreen will both warn you first —
@@ -320,7 +330,8 @@ inboxsweeper wizard      # or the guided terminal version</code>
   <h3 style="margin-top:28px">On the roadmap</h3>
   <ul class="roadmap">
     <li>Archive / mark-as-read as alternatives to Trash</li>
-    <li>A signed one-click <span class="mono">.exe</span> (no security warning at all)</li>
+    <li>A signed Mac app and <span class="mono">.exe</span> — drag-to-Applications, no warnings, no Terminal.
+      Needs a $99/year Apple Developer ID, so it waits until the tool has enough users to justify it.</li>
     <li>More free everyday tools under the same roof</li>
   </ul>
 </section>
