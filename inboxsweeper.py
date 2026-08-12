@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""mail-declutter — safe inbox cleanup + unsubscribe over IMAP (Gmail & Yahoo).
+"""InboxSweeper — safe inbox cleanup + unsubscribe over IMAP (Gmail & Yahoo).
 
 No API project / OAuth needed — just an app password. Deletions MOVE to Trash/Bin
 (recoverable), never permanent. Unsubscribes use RFC-8058 one-click POST or mailto.
 
 Two ways to use it:
-  • Guided (no flags to remember):   python3 gmail_cleanup.py wizard
+  • Guided (no flags to remember):   inboxsweeper wizard
   • Direct commands:                 counts | profile | unsub-list | sweep | unsub-run
 Add --provider gmail|yahoo (default: gmail).
 
@@ -26,7 +26,7 @@ PROVIDERS = {
         "apppw_url": "https://myaccount.google.com/apppasswords",
         "setup": ["Turn ON 2-Step Verification: https://myaccount.google.com/security",
                   "Create an app password: https://myaccount.google.com/apppasswords",
-                  "  → name it 'mail-declutter', copy the 16-character code",
+                  "  → name it 'InboxSweeper', copy the 16-character code",
                   "IMAP is already on for modern Gmail (no toggle needed)."],
     },
     "yahoo": {
@@ -37,7 +37,7 @@ PROVIDERS = {
         "apppw_url": "https://login.yahoo.com/account/security",
         "setup": ["Turn ON 2-Step Verification: https://login.yahoo.com/account/security",
                   "Create an app password: same page → 'Create app password' under",
-                  "  'External connections' → name it 'mail-declutter', copy the code.",
+                  "  'External connections' → name it 'InboxSweeper', copy the code.",
                   "Confirm IMAP is on: Yahoo Mail → Settings → More Settings → Mailboxes."],
     },
 }
@@ -350,7 +350,7 @@ def _anon_uid():
     return u
 
 
-TOOL_VERSION = "0.1.2"   # keep in step with the release tag; telemetry reports it
+TOOL_VERSION = "0.1.3"   # keep in step with the release tag; telemetry reports it
 
 
 def track(action, provider="", ok=True, emails=0, size_bytes=0, unsubs=0):

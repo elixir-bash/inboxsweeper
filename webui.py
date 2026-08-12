@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local browser UI for mail-declutter. Launched via `inboxsweeper.py serve`.
+"""Local browser UI for InboxSweeper. Launched via `inboxsweeper.py serve`.
 
 Binds to 127.0.0.1 only, guarded by a random per-run token in the URL. Reuses the
 engine in inboxsweeper.py — no duplicated cleanup logic.
