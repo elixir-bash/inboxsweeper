@@ -43,3 +43,7 @@ jobs:
       # the publisher configured on the project. Nothing to store or rotate,
       # and a leaked repo secret can't be used to push a release.
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # v1.14.2
+        with:
+          # PyPI versions are immutable, so a re-run (or a release event for a
+          # version already dispatched by hand) would otherwise fail the job.
+          skip-existing: true

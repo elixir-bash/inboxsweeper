@@ -14,7 +14,7 @@ anywhere. Deleted mail goes to Trash, so you can always get it back.
 - ♻️ **Safe** — deletions go to Trash (recoverable), and bank, security, and government email is protected automatically.
 - 🖱️ **Four ways to use it** — a double-click web app, a one-file Windows `.exe`, your AI assistant (Claude / Codex), or the terminal.
 
-**⬇️ Get it:** [Download the app (ZIP)](https://github.com/elixir-bash/inboxsweeper/archive/refs/heads/main.zip) then double-click the launcher inside · or the one-file [Windows .exe](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe) — or scroll to the [Claude & Codex](#ai-coding-agents-claude-code-codex-jules-cursor) / [terminal](#the-terminal-for-coders) options.
+**⬇️ Get it:** [Download the app (ZIP)](https://github.com/elixir-bash/inboxsweeper/archive/refs/heads/main.zip) then double-click the launcher inside · or the one-file [Windows .exe](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe) · or `pipx install inboxsweeper` if you live in a terminal — full options: [Claude & Codex](#ai-coding-agents-claude-code-codex-jules-cursor) · [terminal](#the-terminal-for-coders).
 
 ### How this is different from other "inbox" cleaners
 
@@ -89,7 +89,7 @@ Pick the one that fits you:
 | **Anyone** — no tech needed *(recommended)* | **🖱️ Web app** | Download the ZIP, double-click the launcher. Opens in your browser. → [Web app](#-the-web-app-for-everyone) |
 | **On Windows, want zero setup** | **📦 One-file .exe** | Download `InboxSweeper.exe`, double-click. → [Windows .exe](#-windows-exe-nothing-else-to-install) |
 | **A Claude Code / Codex user** | **🤖 Claude skill** | Install the skill and just ask. → [AI agent](#ai-coding-agents-claude-code-codex-jules-cursor) |
-| **A coder** | **⌨️ Terminal** | Clone, install one dep, run one command. → [Terminal](#the-terminal-for-coders) |
+| **A coder** | **⌨️ Terminal** | `pipx install inboxsweeper`, then one command. → [Terminal](#the-terminal-for-coders) |
 
 ---
 
@@ -189,12 +189,23 @@ This repo ships ready-made instructions so an AI coding agent can drive the tool
 If you just want a clean inbox and don't care how it works:
 
 ```bash
+pipx install inboxsweeper      # or: pip install inboxsweeper
+
+inboxsweeper wizard                    # Gmail
+inboxsweeper wizard --provider yahoo   # Yahoo
+```
+
+On a Mac this is also the path of least resistance — a pip install carries no
+"downloaded from the internet" flag, so there's no Gatekeeper unlock to do.
+
+<details><summary>Prefer to run it from source?</summary>
+
+```bash
 git clone https://github.com/elixir-bash/inboxsweeper && cd inboxsweeper
 pip install -r requirements.txt
-
-python3 inboxsweeper.py wizard                    # Gmail
-python3 inboxsweeper.py wizard --provider yahoo   # Yahoo
+python3 inboxsweeper.py wizard
 ```
+</details>
 
 The wizard walks you through everything, in plain language:
 1. First it asks what you want to do: **Clean up** (unsubscribe + move to Trash) or **Report spam**.

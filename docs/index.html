@@ -300,22 +300,20 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
     <div class="feat"><h4>🤖 AI coding agents</h4>
       <p>Claude Code, Codex, Jules, Cursor &amp; more — install the skill or point them at <span class="mono">AGENTS.md</span>, then just ask them to tidy your inbox. Nothing to learn: you describe it, the agent runs it.</p></div>
     <div class="feat"><h4>⌨️ Terminal</h4>
-      <p>For coders — two lines and you're cleaning.</p></div>
+      <p>For coders — <span class="mono">pipx install inboxsweeper</span>, then one command and you're cleaning.</p></div>
   </div>
 
   <div class="install" style="margin-top:20px">
-    <code>git clone https://github.com/elixir-bash/inboxsweeper
-cd inboxsweeper
-pip install -r requirements.txt
+    <code>pipx install inboxsweeper      # or: pip install inboxsweeper
 
-python3 inboxsweeper.py serve      # web app in your browser
-python3 inboxsweeper.py wizard     # or the guided terminal version</code>
+inboxsweeper serve       # web app in your browser
+inboxsweeper wizard      # or the guided terminal version</code>
   </div>
-  <p class="muted" style="margin-top:12px;font-size:13px">Needs Python 3.9+ and a free app password (the tool shows you exactly how to make one).</p>
+  <p class="muted" style="margin-top:12px;font-size:13px">Needs Python 3.9+ and a free app password (the tool shows you exactly how to make one).
+  On a Mac this is also the smoothest route — a pip install carries no download flag, so there's no Gatekeeper unlock.</p>
 
   <h3 style="margin-top:28px">On the roadmap</h3>
   <ul class="roadmap">
-    <li>One-line install for coders: <span class="mono">pip install inboxsweeper</span> (PyPI)</li>
     <li>Archive / mark-as-read as alternatives to Trash</li>
     <li>A signed one-click <span class="mono">.exe</span> (no security warning at all)</li>
     <li>More free everyday tools under the same roof</li>
