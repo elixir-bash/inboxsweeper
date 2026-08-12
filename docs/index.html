@@ -155,12 +155,16 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
       <em>"cannot be opened because it is from an unidentified developer"</em>, or on newer macOS
       <em>"Apple could not verify it is free of malware"</em>.</p>
       <p><b>On macOS 15 Sequoia and newer</b> (including macOS 26) — Apple removed the old
-      right-click → Open trick, so ignore that advice wherever you find it:</p>
-      <p><b>1.</b> Double-click it, then click <b>Done</b> on the block. <em>Not</em> Move to Trash — that
-      deletes the launcher.<br>
-      <b>2.</b> Open <b>System Settings → Privacy &amp; Security</b>, scroll to <b>Security</b>. It says
-      <em>"InboxSweeper.command was blocked to protect your Mac"</em> → click <b>Open Anyway</b> and authenticate.<br>
-      <b>3.</b> Double-click again → <b>Open</b>. Once ever.</p>
+      right-click → Open trick, so ignore that advice wherever you find it. These are
+      <a href="https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac">Apple's own steps</a>:</p>
+      <p><b>1.</b> Double-click <span class="mono">InboxSweeper.command</span> → click <b>Done</b>.
+      <em>Not</em> Move to Trash, which deletes it.<br>
+      <b>2.</b> <b> menu → System Settings → Privacy &amp; Security</b>, scroll to <b>Security</b>.<br>
+      <b>3.</b> Find the line about <span class="mono">InboxSweeper.command</span> → click <b>Open Anyway</b>.<br>
+      <b>4.</b> Enter your login password or Touch ID → <b>OK</b>.<br>
+      <b>5.</b> Double-click the launcher again → <b>Open</b>. macOS remembers it from now on.</p>
+      <p class="warn">⏱️ Do those steps in one go — Apple shows <b>Open Anyway</b> for only <b>about an hour</b>
+      after the blocked attempt. If the button isn't there, just double-click the launcher again to bring it back.</p>
       <p><b>On macOS 14 and older:</b> right-click (or Control-click) the file → <b>Open</b> → <b>Open</b>.</p></div>
 
     <div class="feat"><h4>🍎 Mac — the one-line shortcut</h4>
@@ -280,6 +284,7 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
     <div class="feat"><h4>Works beyond Gmail</h4><p>Gmail is fully supported, plus experimental Yahoo and any IMAP inbox — not locked to a single provider.</p></div>
     <div class="feat"><h4>Focused, not bloated</h4><p>It does the three things that matter — clean by sender, real unsubscribe, deliberate report-spam — and stops there. No gimmicks bolted on.</p></div>
     <div class="feat"><h4>Free, forever, open source</h4><p>MIT-licensed, no signup, no OTP, no phone number, no subscription. If it ever isn't enough, fork it.</p></div>
+    <div class="feat"><h4>So why isn't it just a website?</h4><p>Because a browser physically can't talk to your mailbox. IMAP is a raw socket connection; JavaScript on a page can only do HTTP. A pure web version would need either a <b>server holding your password</b> and reading your mail, or <b>"Sign in with Google"</b>. Those are the two things this exists to avoid — so it runs a tiny local program instead, and that's what your browser connects to.</p></div>
   </div>
 </section>
 

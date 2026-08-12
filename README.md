@@ -146,13 +146,21 @@ treat it as an unknown app. Nothing is wrong. Each wall and the one button past 
 | *"Apple could not verify…"* / *"unidentified developer"* | Mac, first launch | Click **Done**, then **System Settings → Privacy & Security → Open Anyway** |
 
 **Mac note — this changed in macOS 15.** The old advice you'll find everywhere (right-click → Open) was
-removed by Apple in Sequoia. On macOS 15 and newer, including macOS 26, do this instead:
+removed by Apple in Sequoia. On macOS 15 and newer, including macOS 26, follow
+[Apple's own steps](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac):
 
-1. Double-click `InboxSweeper.command`. macOS blocks it and offers **Move to Trash** or **Done** —
-   click **Done**. (Don't pick Move to Trash; that deletes the launcher.)
-2. Open **System Settings → Privacy & Security**, scroll down to **Security**. You'll see
-   *"InboxSweeper.command was blocked to protect your Mac"* → click **Open Anyway** and authenticate.
-3. Double-click the launcher again → **Open**. That's it, once ever.
+1. **Double-click `InboxSweeper.command`.** macOS blocks it. Click **Done** — *not* **Move to Trash**,
+   which deletes the launcher.
+2. **Apple menu  → System Settings → Privacy & Security.** Scroll down to the **Security** section.
+3. You'll see a line about `InboxSweeper.command` being blocked → click **Open Anyway**.
+4. **Enter your login password** (or Touch ID), then click **OK**.
+5. Double-click the launcher again → **Open**.
+
+⏱️ **Do steps 1–4 in one sitting.** Apple only shows the **Open Anyway** button for **about an hour**
+after the blocked attempt. If you come back tomorrow the button is gone and it looks broken — just
+double-click the launcher again to restart the clock.
+
+After this, macOS remembers it: future double-clicks open normally, like any other app.
 
 On **macOS 14 Sonoma and older**, the old route still works: right-click (or Control-click)
 `InboxSweeper.command` → **Open** → **Open**.
@@ -378,6 +386,15 @@ on your own machine, and it's open source so you can read exactly what it does b
 
 **Do I have to grant Google account access?** No. You paste a scoped app password once; you never
 click through a "Sign in with Google" consent screen handing anyone access to your account.
+
+**Why isn't this just a website I can open?** Because a browser can't talk to a mailbox. IMAP is a
+raw socket connection on port 993, and JavaScript in a page is only allowed to make HTTP requests —
+there's no API that lets a downloaded HTML file reach `imap.gmail.com`. A pure web version would
+need one of two things: a **server that holds your app password** and reads your mail for you, or
+**"Sign in with Google"** (OAuth over HTTPS, which a browser *can* do). Those are precisely the two
+things this tool exists to avoid. So instead it runs a small program on your own machine that speaks
+IMAP, and serves the interface to your browser at `127.0.0.1` — the page you see is local, and
+nothing it touches leaves your computer.
 
 ## Anonymous usage stats
 
