@@ -142,6 +142,14 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
       <p><b>Do this:</b> click <b>More info</b> → <b>Run anyway</b>. The button only appears after you click
       More info, which is why it's easy to miss.</p></div>
 
+    <div class="feat"><h4>🔎 Prove it came from here</h4>
+      <p>Unsigned doesn't have to mean unverifiable. Every release is built by a public workflow
+      that records signed build provenance, so you can check the file yourself:</p>
+      <p><span class="mono">gh attestation verify InboxSweeper.exe --repo elixir-bash/inboxsweeper</span></p>
+      <p>It confirms this exact binary was built from this source by that workflow — most of what a
+      $99/year certificate would tell you, for free. Needs the
+      <a href="https://cli.github.com">GitHub CLI</a>.</p></div>
+
     <div class="feat"><h4>🍎 Mac — "unidentified developer"</h4>
       <p>Double-clicking <span class="mono">InboxSweeper.command</span> gives
       <em>"cannot be opened because it is from an unidentified developer"</em>, or on newer macOS

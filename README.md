@@ -122,6 +122,16 @@ Prefer a true one-file download with **no Python step at all**? On Windows:
 2. Double-click it. Windows SmartScreen may warn (free/unsigned) → click **More info → Run anyway**.
 3. It opens in your **web browser** — pick Gmail or Yahoo and follow the on-screen steps.
 
+**Want proof it's really from this repo?** Every release is built by a public GitHub Actions
+workflow that records signed build provenance. With the [GitHub CLI](https://cli.github.com):
+
+```
+gh attestation verify InboxSweeper.exe --repo elixir-bash/inboxsweeper
+```
+
+That confirms the exact file you downloaded was built from this source, by that workflow —
+which is most of what a code-signing certificate would tell you, without the $99/year.
+
 ---
 
 ## 🚧 First run: what your computer will say

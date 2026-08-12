@@ -350,7 +350,7 @@ def _anon_uid():
     return u
 
 
-TOOL_VERSION = "0.3"
+TOOL_VERSION = "0.1.2"   # keep in step with the release tag; telemetry reports it
 
 
 def track(action, provider="", ok=True, emails=0, size_bytes=0, unsubs=0):
