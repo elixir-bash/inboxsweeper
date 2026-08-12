@@ -109,10 +109,16 @@ def save_creds(provider, addr, pw):
         _keychain_store(PROVIDERS[provider]["kc_addr"], "account", addr)
         return "macOS Keychain"
     path = _credfile(provider)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w") as f:
+    d = os.path.dirname(path)
+    os.makedirs(d, mode=0o700, exist_ok=True)
+    os.chmod(d, 0o700)          # makedirs ignores mode if the dir already exists
+    # Create the file at 0600 up front. Writing first and chmod'ing after leaves
+    # a window where the app password sits on disk under the default umask —
+    # world-readable on most Linux boxes.
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w") as f:
         f.write("addr=%s\napp_password=%s\n" % (addr, pw))
-    os.chmod(path, 0o600)
+    os.chmod(path, 0o600)       # O_CREAT's mode is ignored if the file pre-existed
     return path
 
 

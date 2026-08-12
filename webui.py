@@ -223,6 +223,11 @@ class H(BaseHTTPRequestHandler):
         n = int(self.headers.get("Content-Length", 0))
         req = json.loads(self.rfile.read(n) or b"{}")
         prov = req.get("provider", "gmail")
+        # Unknown values already died on the PROVIDERS lookup downstream, but
+        # relying on a KeyError to validate a browser-supplied string that ends
+        # up in a file path is one refactor away from a traversal bug.
+        if prov not in E.PROVIDERS:
+            self._send(400, json.dumps({"error": "unknown provider"})); return
         try:
             self._send(200, json.dumps(self.route(self.path, prov, req)))
         except Exception as e:
