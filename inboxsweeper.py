@@ -84,9 +84,19 @@ def _keychain_store(service, account, secret):
     return True
 
 
+# Filenames are literals picked by key, never built from the caller's string.
+# Interpolating `provider` into the path was safe (argparse choices= and the
+# PROVIDERS lookup both reject anything else) but it left user input flowing
+# into a filesystem path, which is a traversal waiting for a future caller
+# that skips those checks.
+# Derived from PROVIDERS so adding a provider can't leave this behind.
+_CREDFILES = {name: name + ".creds" for name in PROVIDERS}
+
+
 def _credfile(provider):
+    name = _CREDFILES[provider]          # KeyError on anything unrecognised
     d = os.path.expanduser("~/.config/mail-declutter")
-    return os.path.join(d, "%s.creds" % provider)
+    return os.path.join(d, name)
 
 
 def load_creds(provider):
