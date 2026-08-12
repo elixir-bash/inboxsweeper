@@ -102,7 +102,7 @@ Works on **Mac, Windows, and Linux**, always runs the latest version — nothing
 2. **Unzip it** — double-click on Mac; right-click → *Extract All* on Windows.
 3. Open the unzipped folder and **double-click the launcher for your computer:**
    - **🍎 macOS →** `InboxSweeper.command`
-     *(first time only: right-click it → **Open** → **Open** to clear the one free-software warning.)*
+     *(first time only, macOS will block it once — [here's the one-time unlock](#-first-run-what-your-computer-will-say).)*
    - **🪟 Windows →** `InboxSweeper.bat`
    - **🐧 Linux →** `InboxSweeper.command` (or run `python3 inboxsweeper.py serve`)
 4. A small window opens and **InboxSweeper appears in your web browser.** Keep that window open while you use it.
@@ -143,10 +143,22 @@ treat it as an unknown app. Nothing is wrong. Each wall and the one button past 
 |---|---|---|
 | *"isn't commonly downloaded" / "can't be downloaded securely"* | Chrome/Edge, during download | Downloads bar → **⋮** → **Keep** → **Keep anyway** |
 | *"Windows protected your PC"* | Windows, first launch | **More info** → **Run anyway** |
-| *"unidentified developer"* / *"Apple could not verify…"* | Mac, first launch | **Right-click** (or Control-click) `InboxSweeper.command` → **Open** → **Open** |
+| *"Apple could not verify…"* / *"unidentified developer"* | Mac, first launch | Click **Done**, then **System Settings → Privacy & Security → Open Anyway** |
 
-**Mac note:** a plain double-click will keep failing. The right-click → Open route is what tells macOS you
-trust it, and you only do it once. If it still refuses, clear the download quarantine flag:
+**Mac note — this changed in macOS 15.** The old advice you'll find everywhere (right-click → Open) was
+removed by Apple in Sequoia. On macOS 15 and newer, including macOS 26, do this instead:
+
+1. Double-click `InboxSweeper.command`. macOS blocks it and offers **Move to Trash** or **Done** —
+   click **Done**. (Don't pick Move to Trash; that deletes the launcher.)
+2. Open **System Settings → Privacy & Security**, scroll down to **Security**. You'll see
+   *"InboxSweeper.command was blocked to protect your Mac"* → click **Open Anyway** and authenticate.
+3. Double-click the launcher again → **Open**. That's it, once ever.
+
+On **macOS 14 Sonoma and older**, the old route still works: right-click (or Control-click)
+`InboxSweeper.command` → **Open** → **Open**.
+
+**Fastest route if you're comfortable in Terminal** (any macOS version) — this removes the "downloaded
+from the internet" flag, so the launcher just opens:
 
 ```bash
 xattr -d com.apple.quarantine ~/Downloads/inboxsweeper-main/InboxSweeper.command

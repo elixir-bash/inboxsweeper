@@ -154,14 +154,20 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
       <p>Double-clicking <span class="mono">InboxSweeper.command</span> gives
       <em>"cannot be opened because it is from an unidentified developer"</em>, or on newer macOS
       <em>"Apple could not verify it is free of malware"</em>.</p>
-      <p><b>Do this:</b> <b>right-click</b> (or Control-click) the file → <b>Open</b> → <b>Open</b> in the dialog.
-      You only do this once. A plain double-click will keep failing — the right-click route is what tells
-      macOS you trust it.</p></div>
+      <p><b>On macOS 15 Sequoia and newer</b> (including macOS 26) — Apple removed the old
+      right-click → Open trick, so ignore that advice wherever you find it:</p>
+      <p><b>1.</b> Double-click it, then click <b>Done</b> on the block. <em>Not</em> Move to Trash — that
+      deletes the launcher.<br>
+      <b>2.</b> Open <b>System Settings → Privacy &amp; Security</b>, scroll to <b>Security</b>. It says
+      <em>"InboxSweeper.command was blocked to protect your Mac"</em> → click <b>Open Anyway</b> and authenticate.<br>
+      <b>3.</b> Double-click again → <b>Open</b>. Once ever.</p>
+      <p><b>On macOS 14 and older:</b> right-click (or Control-click) the file → <b>Open</b> → <b>Open</b>.</p></div>
 
-    <div class="feat"><h4>🍎 Mac — still stuck?</h4>
-      <p>If macOS refuses even after right-click → Open, clear the download quarantine flag. Open Terminal, paste:</p>
+    <div class="feat"><h4>🍎 Mac — the one-line shortcut</h4>
+      <p>Comfortable in Terminal? This clears the "downloaded from the internet" flag on any macOS
+      version, and then it just opens:</p>
       <p><span class="mono">xattr -d com.apple.quarantine ~/Downloads/inboxsweeper-main/InboxSweeper.command</span></p>
-      <p>Then double-click as normal. (Adjust the path if you unzipped somewhere else.)</p></div>
+      <p>Adjust the path if you unzipped somewhere else. Nothing else to undo afterwards.</p></div>
   </div>
 
   <p class="muted" style="margin-top:14px">Still stuck? <a href="https://github.com/elixir-bash/inboxsweeper/issues">Tell me what you saw</a>
