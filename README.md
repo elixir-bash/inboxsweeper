@@ -12,9 +12,9 @@ anywhere. Deleted mail goes to Trash, so you can always get it back.
 - 🧹 **Cleans by who sent it** — clears the junk without touching your receipts, orders, or bookings.
 - ✉️ **Actually unsubscribes** — it uses the real one-click unsubscribe, not just delete-and-hope.
 - ♻️ **Safe** — deletions go to Trash (recoverable), and bank, security, and government email is protected automatically.
-- 🖱️ **Four ways to use it** — a double-click web app, a one-file Windows `.exe`, the terminal, or your AI assistant (Claude / Codex).
+- 🖱️ **Four ways to use it** — a double-click web app, a one-file Windows `.exe`, your AI assistant (Claude / Codex), or the terminal.
 
-**⬇️ Get it:** [Download the app (ZIP)](https://github.com/elixir-bash/inboxsweeper/archive/refs/heads/main.zip) then double-click the launcher inside · or the one-file [Windows .exe](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe) — or scroll to [the terminal](#the-terminal-for-coders) / [Claude & Codex](#claude-code--codex) options.
+**⬇️ Get it:** [Download the app (ZIP)](https://github.com/elixir-bash/inboxsweeper/archive/refs/heads/main.zip) then double-click the launcher inside · or the one-file [Windows .exe](https://github.com/elixir-bash/inboxsweeper/releases/latest/download/InboxSweeper.exe) — or scroll to the [Claude & Codex](#ai-coding-agents-claude-code-codex-jules-cursor) / [terminal](#the-terminal-for-coders) options.
 
 ### How this is different from other "inbox" cleaners
 
@@ -88,8 +88,8 @@ Pick the one that fits you:
 |---|---|---|
 | **Anyone** — no tech needed *(recommended)* | **🖱️ Web app** | Download the ZIP, double-click the launcher. Opens in your browser. → [Web app](#-the-web-app-for-everyone) |
 | **On Windows, want zero setup** | **📦 One-file .exe** | Download `InboxSweeper.exe`, double-click. → [Windows .exe](#-windows-exe-nothing-else-to-install) |
+| **A Claude Code / Codex user** | **🤖 Claude skill** | Install the skill and just ask. → [AI agent](#ai-coding-agents-claude-code-codex-jules-cursor) |
 | **A coder** | **⌨️ Terminal** | `pip install`, then one command. → [Terminal](#the-terminal-for-coders) |
-| **A Claude Code / Codex user** | **🤖 Claude skill** | Install the skill and just ask. → [AI agent](#claude-code--codex) |
 
 ---
 
@@ -168,6 +168,21 @@ Hit something not listed here? [Open an issue](https://github.com/elixir-bash/in
 OS, browser and the exact wording — that's the fastest way to get it fixed.
 
 ---
+
+## AI coding agents (Claude Code, Codex, Jules, Cursor…)
+
+This repo ships ready-made instructions so an AI coding agent can drive the tool for you. See
+[`integrations/`](integrations/) for the full map — in short:
+
+- **Claude Code** — install as a skill (bundles the script so it's self-contained):
+  ```bash
+  mkdir -p ~/.claude/skills/inboxsweeper
+  cp integrations/claude-code/SKILL.md inboxsweeper.py ~/.claude/skills/inboxsweeper/
+  ```
+  Then just ask Claude: *"declutter my gmail"* / *"unsubscribe from these senders"* / *"report these as spam"*.
+- **Codex, Jules, Cursor, Gemini CLI & other agents** — they all read [`AGENTS.md`](AGENTS.md)
+  automatically. Drop `inboxsweeper.py` + `AGENTS.md` in your project (or run the agent from this
+  repo) and just ask. It documents the commands, the safety rules, and the recommended flow.
 
 ## The terminal (for coders)
 
@@ -333,21 +348,6 @@ can use.
   - **one-click** → HTTP `POST` with body `List-Unsubscribe=One-Click` ([RFC 8058](https://www.rfc-editor.org/rfc/rfc8058)).
   - **mailto** → sends an unsubscribe email via SMTP using your app password.
   - **weblink-only** → reported for manual handling (never auto-clicked; could be a tracker).
-
-## AI coding agents (Claude Code, Codex, Jules, Cursor…)
-
-This repo ships ready-made instructions so an AI coding agent can drive the tool for you. See
-[`integrations/`](integrations/) for the full map — in short:
-
-- **Claude Code** — install as a skill (bundles the script so it's self-contained):
-  ```bash
-  mkdir -p ~/.claude/skills/inboxsweeper
-  cp integrations/claude-code/SKILL.md inboxsweeper.py ~/.claude/skills/inboxsweeper/
-  ```
-  Then just ask Claude: *"declutter my gmail"* / *"unsubscribe from these senders"* / *"report these as spam"*.
-- **Codex, Jules, Cursor, Gemini CLI & other agents** — they all read [`AGENTS.md`](AGENTS.md)
-  automatically. Drop `inboxsweeper.py` + `AGENTS.md` in your project (or run the agent from this
-  repo) and just ask. It documents the commands, the safety rules, and the recommended flow.
 
 ## FAQ
 
