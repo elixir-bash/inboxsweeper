@@ -89,7 +89,7 @@ Pick the one that fits you:
 | **Anyone** — no tech needed *(recommended)* | **🖱️ Web app** | Download the ZIP, double-click the launcher. Opens in your browser. → [Web app](#-the-web-app-for-everyone) |
 | **On Windows, want zero setup** | **📦 One-file .exe** | Download `InboxSweeper.exe`, double-click. → [Windows .exe](#-windows-exe-nothing-else-to-install) |
 | **A Claude Code / Codex user** | **🤖 Claude skill** | Install the skill and just ask. → [AI agent](#ai-coding-agents-claude-code-codex-jules-cursor) |
-| **A coder** | **⌨️ Terminal** | `pip install`, then one command. → [Terminal](#the-terminal-for-coders) |
+| **A coder** | **⌨️ Terminal** | Clone, install one dep, run one command. → [Terminal](#the-terminal-for-coders) |
 
 ---
 
@@ -189,6 +189,7 @@ This repo ships ready-made instructions so an AI coding agent can drive the tool
 If you just want a clean inbox and don't care how it works:
 
 ```bash
+git clone https://github.com/elixir-bash/inboxsweeper && cd inboxsweeper
 pip install -r requirements.txt
 
 python3 inboxsweeper.py wizard                    # Gmail
