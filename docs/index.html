@@ -123,73 +123,12 @@ footer{padding:40px 0;color:var(--dim);text-align:center;border-top:1px solid va
     <a class="btn ghost" href="#start">Other ways</a>
     <a class="btn ghost" href="https://github.com/elixir-bash/inboxsweeper">GitHub</a>
   </div>
-  <p class="muted" style="font-size:13px;margin-top:10px">Free &amp; open. Unzip → double-click <span class="mono">InboxSweeper.command</span> (Mac) or <span class="mono">InboxSweeper.bat</span> (Windows). Opens in your browser. <b>Windows without Python?</b> Grab the one-file <span class="mono">.exe</span>.</p>
-  <p class="muted" style="font-size:13px;margin-top:6px">⚠️ <b>First time?</b> Your browser or OS will probably warn you — the app is unsigned.
-  <a href="#firstrun">Here's exactly what you'll see and what to click →</a></p>
+  <p class="muted" style="font-size:13px;margin-top:10px">
+    <b>🪟 Windows:</b> unzip → double-click, opens in your browser (or the one-file <span class="mono">.exe</span>, no Python needed). ·
+    <b>🍎 Mac:</b> <span class="mono">pip3 install inboxsweeper</span> → <span class="mono">inboxsweeper serve</span>.
+    <a href="#start">All the ways →</a> · <a href="#firstrun">Setup warnings, and what to click →</a></p>
 </header>
 
-<section id="firstrun" style="margin-top:34px">
-  <h2>First run: what your computer will say</h2>
-  <p class="muted">InboxSweeper isn't code-signed — a signing certificate costs $99/year and this is free,
-  so your browser and OS will treat it as an unknown app. Nothing is wrong; here's each screen and the
-  one button that gets past it. You can read every line of the source first if you'd rather.</p>
-
-  <div class="grid" style="margin-top:18px">
-    <div class="feat"><h4>🪟 Windows — the download itself is blocked</h4>
-      <p>Chrome or Edge may say <em>"InboxSweeper.exe isn't commonly downloaded"</em> or
-      <em>"can't be downloaded securely"</em> and hide the file.</p>
-      <p><b>Do this:</b> open the browser's Downloads bar or the <span class="mono">⋮</span> next to the file →
-      <b>Keep</b> → <b>Keep anyway</b>. The download then completes normally.</p></div>
-
-    <div class="feat"><h4>🪟 Windows — SmartScreen on first launch</h4>
-      <p>A blue box: <em>"Windows protected your PC"</em>.</p>
-      <p><b>Do this:</b> click <b>More info</b> → <b>Run anyway</b>. The button only appears after you click
-      More info, which is why it's easy to miss.</p></div>
-
-    <div class="feat"><h4>🔎 Prove it came from here</h4>
-      <p>Unsigned doesn't have to mean unverifiable. Every release is built by a public workflow
-      that records signed build provenance, so you can check the file yourself:</p>
-      <p><span class="mono">gh attestation verify InboxSweeper.exe --repo elixir-bash/inboxsweeper</span></p>
-      <p>It confirms this exact binary was built from this source by that workflow — most of what a
-      $99/year certificate would tell you, for free. Needs the
-      <a href="https://cli.github.com">GitHub CLI</a>.</p></div>
-
-    <div class="feat"><h4>🍎 Mac — the command that actually works</h4>
-      <p>If you downloaded the ZIP: open <b>Terminal</b> (hold ⌘, press Space, type
-      <span class="mono">Terminal</span>, Return), paste this, press Return:</p>
-      <p><span class="mono">xattr -d com.apple.quarantine ~/Downloads/inboxsweeper-main/InboxSweeper.command</span></p>
-      <p>Then double-click <span class="mono">InboxSweeper.command</span> in Finder — it opens normally,
-      now and every time after.</p>
-      <p class="hint">Got <em>"No such file or directory"</em>? Your folder is elsewhere. Type
-      <span class="mono">xattr -d com.apple.quarantine </span> with a trailing space, then <b>drag the file
-      from Finder into the Terminal window</b> — it fills in the path — and press Return.</p></div>
-    <div class="feat"><h4>🍎 Mac — "unidentified developer"</h4>
-      <p>Double-clicking <span class="mono">InboxSweeper.command</span> gives
-      <em>"cannot be opened because it is from an unidentified developer"</em>, or on newer macOS
-      <em>"Apple could not verify it is free of malware"</em>.</p>
-      <p class="warn">🍎 <b>Skip all of this with one line:</b> <span class="mono">pip3 install inboxsweeper</span>
-      then <span class="mono">inboxsweeper serve</span>. A pip install carries no download flag, so Gatekeeper
-      never gets involved — and you get the same browser app.</p>
-      <p><b>On macOS 15 Sequoia and newer</b> (including macOS 26) — Apple removed the old
-      right-click → Open trick, so ignore that advice wherever you find it. These are
-      <a href="https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac">Apple's own steps</a>,
-      but they're built for <span class="mono">.app</span> bundles and are <b>unreliable for launcher files
-      like ours</b> — the approval button often doesn't appear. If that's you, nothing is broken; use the line above.</p>
-      <p><b>1.</b> Double-click <span class="mono">InboxSweeper.command</span> → click <b>Done</b>.
-      <em>Not</em> Move to Trash, which deletes it.<br>
-      <b>2.</b> <b> menu → System Settings → Privacy &amp; Security</b>, scroll to <b>Security</b>.<br>
-      <b>3.</b> Find the line about <span class="mono">InboxSweeper.command</span> → click <b>Open Anyway</b>.<br>
-      <b>4.</b> Enter your login password or Touch ID → <b>OK</b>.<br>
-      <b>5.</b> Double-click the launcher again → <b>Open</b>. macOS remembers it from now on.</p>
-      <p class="warn">⏱️ Do those steps in one go — Apple shows <b>Open Anyway</b> for only <b>about an hour</b>
-      after the blocked attempt. If the button isn't there, just double-click the launcher again to bring it back.</p>
-      <p><b>On macOS 14 and older:</b> right-click (or Control-click) the file → <b>Open</b> → <b>Open</b>.</p></div>
-
-  </div>
-
-  <p class="muted" style="margin-top:14px">Still stuck? <a href="https://github.com/elixir-bash/inboxsweeper/issues">Tell me what you saw</a>
-  — which OS, which browser, and the exact wording — and I'll fix it.</p>
-</section>
 
 <div class="pillars">
   <div class="pillar"><div class="ic">🔒</div><h3>Truly private</h3><p>Runs 100% locally over IMAP with an app password. Your email never touches a third-party server. Ever.</p></div>
@@ -344,6 +283,69 @@ inboxsweeper wizard      # or the guided terminal version</code>
       Needs a $99/year Apple Developer ID, so it waits until the tool has enough users to justify it.</li>
     <li>More free everyday tools under the same roof</li>
   </ul>
+</section>
+
+<section id="firstrun" style="margin-top:34px">
+  <h2>First run: what your computer will say</h2>
+  <p class="muted">InboxSweeper isn't code-signed — a signing certificate costs $99/year and this is free,
+  so your browser and OS will treat it as an unknown app. Nothing is wrong; here's each screen and the
+  one button that gets past it. You can read every line of the source first if you'd rather.</p>
+
+  <div class="grid" style="margin-top:18px">
+    <div class="feat"><h4>🪟 Windows — the download itself is blocked</h4>
+      <p>Chrome or Edge may say <em>"InboxSweeper.exe isn't commonly downloaded"</em> or
+      <em>"can't be downloaded securely"</em> and hide the file.</p>
+      <p><b>Do this:</b> open the browser's Downloads bar or the <span class="mono">⋮</span> next to the file →
+      <b>Keep</b> → <b>Keep anyway</b>. The download then completes normally.</p></div>
+
+    <div class="feat"><h4>🪟 Windows — SmartScreen on first launch</h4>
+      <p>A blue box: <em>"Windows protected your PC"</em>.</p>
+      <p><b>Do this:</b> click <b>More info</b> → <b>Run anyway</b>. The button only appears after you click
+      More info, which is why it's easy to miss.</p></div>
+
+    <div class="feat"><h4>🔎 Prove it came from here</h4>
+      <p>Unsigned doesn't have to mean unverifiable. Every release is built by a public workflow
+      that records signed build provenance, so you can check the file yourself:</p>
+      <p><span class="mono">gh attestation verify InboxSweeper.exe --repo elixir-bash/inboxsweeper</span></p>
+      <p>It confirms this exact binary was built from this source by that workflow — most of what a
+      $99/year certificate would tell you, for free. Needs the
+      <a href="https://cli.github.com">GitHub CLI</a>.</p></div>
+
+    <div class="feat"><h4>🍎 Mac — the command that actually works</h4>
+      <p>If you downloaded the ZIP: open <b>Terminal</b> (hold ⌘, press Space, type
+      <span class="mono">Terminal</span>, Return), paste this, press Return:</p>
+      <p><span class="mono">xattr -d com.apple.quarantine ~/Downloads/inboxsweeper-main/InboxSweeper.command</span></p>
+      <p>Then double-click <span class="mono">InboxSweeper.command</span> in Finder — it opens normally,
+      now and every time after.</p>
+      <p class="hint">Got <em>"No such file or directory"</em>? Your folder is elsewhere. Type
+      <span class="mono">xattr -d com.apple.quarantine </span> with a trailing space, then <b>drag the file
+      from Finder into the Terminal window</b> — it fills in the path — and press Return.</p></div>
+    <div class="feat"><h4>🍎 Mac — "unidentified developer"</h4>
+      <p>Double-clicking <span class="mono">InboxSweeper.command</span> gives
+      <em>"cannot be opened because it is from an unidentified developer"</em>, or on newer macOS
+      <em>"Apple could not verify it is free of malware"</em>.</p>
+      <p class="warn">🍎 <b>Skip all of this with one line:</b> <span class="mono">pip3 install inboxsweeper</span>
+      then <span class="mono">inboxsweeper serve</span>. A pip install carries no download flag, so Gatekeeper
+      never gets involved — and you get the same browser app.</p>
+      <p><b>On macOS 15 Sequoia and newer</b> (including macOS 26) — Apple removed the old
+      right-click → Open trick, so ignore that advice wherever you find it. These are
+      <a href="https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac">Apple's own steps</a>,
+      but they're built for <span class="mono">.app</span> bundles and are <b>unreliable for launcher files
+      like ours</b> — the approval button often doesn't appear. If that's you, nothing is broken; use the line above.</p>
+      <p><b>1.</b> Double-click <span class="mono">InboxSweeper.command</span> → click <b>Done</b>.
+      <em>Not</em> Move to Trash, which deletes it.<br>
+      <b>2.</b> <b> menu → System Settings → Privacy &amp; Security</b>, scroll to <b>Security</b>.<br>
+      <b>3.</b> Find the line about <span class="mono">InboxSweeper.command</span> → click <b>Open Anyway</b>.<br>
+      <b>4.</b> Enter your login password or Touch ID → <b>OK</b>.<br>
+      <b>5.</b> Double-click the launcher again → <b>Open</b>. macOS remembers it from now on.</p>
+      <p class="warn">⏱️ Do those steps in one go — Apple shows <b>Open Anyway</b> for only <b>about an hour</b>
+      after the blocked attempt. If the button isn't there, just double-click the launcher again to bring it back.</p>
+      <p><b>On macOS 14 and older:</b> right-click (or Control-click) the file → <b>Open</b> → <b>Open</b>.</p></div>
+
+  </div>
+
+  <p class="muted" style="margin-top:14px">Still stuck? <a href="https://github.com/elixir-bash/inboxsweeper/issues">Tell me what you saw</a>
+  — which OS, which browser, and the exact wording — and I'll fix it.</p>
 </section>
 
 <section id="story" style="text-align:center">
