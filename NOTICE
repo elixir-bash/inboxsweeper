@@ -1,0 +1,9 @@
+A note from the author: InboxSweeper is free and open source. If it helps you, or you
+reuse or build on it, a mention or a link back to
+https://github.com/elixir-bash/inboxsweeper is genuinely appreciated (not required).
+— Mukundan Govindaraj
+
+(This request lives here rather than in LICENSE so that LICENSE stays a verbatim
+MIT text. Appending to it made GitHub and package indexes classify the project as
+"Other" instead of MIT, which reads as a licensing question mark to anyone
+deciding whether to use or package it.)

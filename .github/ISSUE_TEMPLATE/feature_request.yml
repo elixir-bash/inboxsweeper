@@ -1,0 +1,32 @@
+name: 💡 Feature request
+description: Something the tool should do that it doesn't.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        InboxSweeper stays deliberately small — cleaning, unsubscribing,
+        reporting spam. Ideas that keep it focused (and local-only) land best.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's the annoyance?
+      description: The problem you hit, not the solution you have in mind.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you want it to do?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Does it fit the constraints?
+      options:
+        - label: It works without uploading anything or signing into a cloud service
+        - label: It doesn't need an OAuth "Sign in with Google" flow

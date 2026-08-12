@@ -1,0 +1,50 @@
+name: 🐞 Bug report
+description: Something didn't work, or worked in a way you didn't expect.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Don't paste your email address, app password, or any message contents —
+        this issue is public. Nothing in the fields below needs them.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, what you got instead.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: how
+    attributes:
+      label: How are you running it?
+      options:
+        - Windows .exe (downloaded from Releases)
+        - InboxSweeper.command / .bat launcher
+        - Terminal (python inboxsweeper.py)
+        - Through Claude Code / Codex / another agent
+    validations:
+      required: true
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Mail provider
+      options: [Gmail, Yahoo, Other IMAP]
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: OS and version
+      placeholder: "macOS 15.5, InboxSweeper v0.1.1"
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Error output
+      description: Paste any error text. It's rendered as code, so no formatting needed.
+      render: shell

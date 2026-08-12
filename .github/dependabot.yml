@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # The .exe users download is built from these, so a bad dep ships to them.
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels: [dependencies]
+
+  # Actions are SHA-pinned in release.yml; Dependabot bumps the pins so
+  # pinning doesn't quietly mean "frozen on a version with a known CVE".
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels: [dependencies]

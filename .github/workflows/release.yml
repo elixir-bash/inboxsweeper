@@ -5,8 +5,8 @@ on:
     tags: ['v*']
   workflow_dispatch:
 
-permissions:
-  contents: write
+# Least privilege at the top; the build job widens only what it needs.
+permissions: {}
 
 jobs:
   build:
@@ -14,9 +14,17 @@ jobs:
     # Mac/Linux use the double-click launcher (InboxSweeper.command) over the
     # source ZIP, so there's nothing to build for them.
     runs-on: windows-latest
+    permissions:
+      contents: write      # create the release + upload the .exe
+      id-token: write      # OIDC identity for build provenance
+      attestations: write  # record the provenance attestation
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      # Actions are pinned to commit SHAs: a tag like @v4 is mutable, so an
+      # upstream compromise would silently reach the binary users download.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: '3.11'
       - run: pip install pyinstaller requests
@@ -26,9 +34,18 @@ jobs:
           pyinstaller --noconfirm --onefile --name InboxSweeper
           --collect-submodules requests --hidden-import webui --hidden-import inboxsweeper app.py
 
+      # We don't pay for an Authenticode cert, so the .exe is unsigned and
+      # SmartScreen warns. Provenance is the free alternative: it proves this
+      # binary was built by this workflow from this commit. Verify with
+      #   gh attestation verify InboxSweeper.exe --repo elixir-bash/inboxsweeper
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: dist/InboxSweeper.exe
+
       - name: Upload to release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228  # v3.0.2
         with:
           files: |
             dist/InboxSweeper.exe
