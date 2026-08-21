@@ -350,7 +350,7 @@ def _anon_uid():
     return u
 
 
-TOOL_VERSION = "0.1.3"   # keep in step with the release tag; telemetry reports it
+TOOL_VERSION = "0.1.4"   # keep in step with the release tag; telemetry reports it
 
 
 def track(action, provider="", ok=True, emails=0, size_bytes=0, unsubs=0):
@@ -368,6 +368,80 @@ def track(action, provider="", ok=True, emails=0, size_bytes=0, unsubs=0):
                                        "User-Agent": "InboxSweeper/" + TOOL_VERSION}), timeout=4)
     except Exception:
         pass
+
+
+# ------------------------------------------------------------- uninstall ------
+_STATE_DIR = "~/.config/mail-declutter"
+
+
+def _uninstall_targets():
+    """Everything this tool ever writes outside its own package. Keep in step with
+    _keychain_store(), _blocklist_path(), _anon_uid() and cmd_remind()."""
+    kc = []
+    for prov in PROVIDERS.values():
+        kc += [prov["kc"], prov["kc_addr"]]
+    return kc, os.path.expanduser(_STATE_DIR)
+
+
+def cmd_uninstall(yes=False):
+    kc_services, state_dir = _uninstall_targets()
+
+    # what actually exists right now
+    present_kc = [sv for sv in kc_services
+                  if subprocess.run(["security", "find-generic-password", "-s", sv],
+                                    capture_output=True).returncode == 0]
+    state_files = []
+    if os.path.isdir(state_dir):
+        for root, _d, files in os.walk(state_dir):
+            state_files += [os.path.join(root, f) for f in files]
+    cron_lines = 0
+    if sys.platform != "win32":
+        cur = subprocess.run(["crontab", "-l"], capture_output=True, text=True).stdout
+        cron_lines = sum(1 for l in cur.splitlines() if _REMIND_TAG in l)
+
+    if not present_kc and not state_files and not cron_lines:
+        print("Nothing to remove — no credentials, state or reminders found.")
+        print("To remove the program itself:  pip uninstall inboxsweeper")
+        return
+
+    print("This will remove:")
+    for sv in present_kc:
+        print("  keychain   %s" % sv)
+    for f in state_files:
+        print("  file       %s" % f)
+    if state_files or os.path.isdir(state_dir):
+        print("  directory  %s" % state_dir)
+    if cron_lines:
+        print("  cron       %d quarterly reminder line(s)" % cron_lines)
+    print("\nYour mail is untouched — this only removes what InboxSweeper stored on this machine.")
+
+    if not yes:
+        try:
+            if input("\nProceed? [y/N] ").strip().lower() not in ("y", "yes"):
+                print("Cancelled — nothing removed."); return
+        except EOFError:
+            print("Cancelled — nothing removed (no tty; re-run with --yes)."); return
+
+    removed = []
+    for sv in present_kc:
+        # a service can hold several accounts; delete until none remain
+        while subprocess.run(["security", "delete-generic-password", "-s", sv],
+                             capture_output=True).returncode == 0:
+            pass
+        removed.append("keychain %s" % sv)
+    if os.path.isdir(state_dir):
+        import shutil
+        shutil.rmtree(state_dir, ignore_errors=True)
+        removed.append("state %s" % state_dir)
+    if cron_lines:
+        cmd_remind(off=True)
+        removed.append("%d cron reminder line(s)" % cron_lines)
+
+    print("\nRemoved:")
+    for r in removed:
+        print("  - %s" % r)
+    print("\nThe program itself is still installed. Finish with:")
+    print("  pip uninstall inboxsweeper      # or: pipx uninstall inboxsweeper")
 
 
 # ------------------------------------------------------- quarterly reminder ----
@@ -719,11 +793,17 @@ def main():
     x.add_argument("--yes", action="store_true")
     x = sub.add_parser("remind", parents=[base], help="install a quarterly reminder to clean your inbox")
     x.add_argument("--off", action="store_true")
-    sub.add_parser("remind-run", parents=[base], help=argparse.SUPPRESS)
+    sub.add_parser("remind-run", parents=[base])  # internal; no help= (add_parser ignores SUPPRESS)
+    p.add_argument("--version", action="version", version="inboxsweeper " + TOOL_VERSION)
+    sub.add_parser("uninstall", parents=[base],
+                   help="remove stored credentials, local state and the quarterly reminder"
+                   ).add_argument("--yes", action="store_true", help="skip the confirmation prompt")
     a = p.parse_args()
     prov = a.provider
     track("cmd_" + a.cmd, provider=prov)  # anonymous usage/perf ping (off unless configured)
 
+    if a.cmd == "uninstall":
+        cmd_uninstall(a.yes); return
     if a.cmd == "remind":
         cmd_remind(a.off); return
     if a.cmd == "remind-run":

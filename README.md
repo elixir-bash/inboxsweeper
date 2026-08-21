@@ -483,6 +483,31 @@ content — your mail still never leaves your machine. Turn it off completely wi
 - Nothing is hardcoded; credentials come from Keychain or env vars.
 - `.gitignore` keeps local credential files out of the repo.
 
+## Uninstall
+
+InboxSweeper stores three things outside its own package: your app password in the OS
+keychain, a small state directory, and (only if you ran `remind`) a quarterly cron line.
+One command removes all of it:
+
+```
+inboxsweeper uninstall
+```
+
+It shows you exactly what it will delete and asks before touching anything. Add `--yes`
+to skip the prompt. Your mail is never touched — this only clears what the tool stored
+on your machine.
+
+Then remove the program itself:
+
+```
+pip uninstall inboxsweeper      # or: pipx uninstall inboxsweeper
+```
+
+Prefer to do it by hand? The state directory is `~/.config/mail-declutter/`, the keychain
+services are `gmail_cleanup`, `gmail_cleanup_addr`, `yahoo_cleanup`, `yahoo_cleanup_addr`,
+and the reminder is a crontab line tagged `# inboxsweeper-reminder` (also removable with
+`inboxsweeper remind --off`).
+
 ## License
 
 MIT — see [`LICENSE`](LICENSE). Personal tool; use at your own risk. Always dry-run first.
